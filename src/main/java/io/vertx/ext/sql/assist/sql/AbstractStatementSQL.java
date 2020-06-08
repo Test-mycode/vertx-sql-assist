@@ -6,7 +6,6 @@ import java.util.List;
 
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.logging.Logger;
-import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.sql.assist.SQLStatement;
 import io.vertx.ext.sql.assist.SqlAndParams;
 import io.vertx.ext.sql.assist.SqlAssist;
@@ -21,12 +20,8 @@ import io.vertx.ext.sql.assist.TableId;
  * 通常不支持limit分页的数据库需要重写{@link #selectAllSQL(SqlAssist)}与{@link #selectByObjSQL(Object, String, String, boolean)}这两个方法
  * 
  * @author <a href="https://mirrentools.org/">Mirren</a>
- * @param <T>
  */
 public abstract class AbstractStatementSQL implements SQLStatement {
-
-	/** 日志工具 */
-	private final Logger LOG = LoggerFactory.getLogger(AbstractStatementSQL.class);
 	/** 表的名称 */
 	private String sqlTableName;
 	/** 主键的名称 */
@@ -40,7 +35,7 @@ public abstract class AbstractStatementSQL implements SQLStatement {
 		if (table == null || table.value().isEmpty()) {
 			throw new NullPointerException(entity.getName() + " no Table annotation ,you need to set @Table on the class");
 		}
-		this.sqlTableName = table.value();
+		this.sqlTableName = this.getSqlTableName(table.value());
 		boolean hasId = false;
 		boolean hasCol = false;
 		Field[] fields = entity.getDeclaredFields();
@@ -53,26 +48,23 @@ public abstract class AbstractStatementSQL implements SQLStatement {
 				continue;
 			}
 			if (tableId != null) {
-				if (tableId.value() == null || tableId.value().isEmpty()) {
+				if ( tableId.value().isEmpty()) {
 					continue;
 				}
 				if (this.sqlPrimaryId != null) {
-					this.sqlPrimaryId += tableId.value();
+					this.sqlPrimaryId += this.getSqlPrimaryId(tableId.value());
 				} else {
-					this.sqlPrimaryId = tableId.value();
+					this.sqlPrimaryId = this.getSqlPrimaryId(tableId.value());
 				}
 				hasId = true;
-				column.append("," + tableId.value());
-				if (tableId.alias() != null && !tableId.alias().isEmpty()) {
-					column.append(" AS \"" + tableId.alias() + "\"");
+				column.append(",").append(this.getSqlPrimaryId(tableId.value()));
+				if (!tableId.alias().isEmpty()) {
+					column.append(" AS ").append(this.getSqlPrimaryIdAlias(tableId.alias()));
 				}
 			} else {
-				if (tableCol == null) {
-					continue;
-				}
-				column.append("," + tableCol.value());
-				if (tableCol.alias() != null && !tableCol.alias().isEmpty()) {
-					column.append(" AS \"" + tableCol.alias() + "\"");
+				column.append(",").append(this.getSqlTableColumns(tableCol.value()));
+				if (!tableCol.alias().isEmpty()) {
+					column.append(" AS ").append(this.getSqlTableColumnsAlias(tableCol.alias()));
 				}
 				hasCol = true;
 			}
@@ -84,6 +76,26 @@ public abstract class AbstractStatementSQL implements SQLStatement {
 			throw new NullPointerException(entity.getName() + " no TableColumn annotation ,you need to set @TableColumn on the field");
 		}
 		this.sqlResultColumns = column.substring(1);
+	}
+
+	protected String getSqlTableColumnsAlias(String alias) {
+		return alias;
+	}
+
+	protected String getSqlTableColumns(String value) {
+		return value;
+	}
+
+	protected String getSqlPrimaryIdAlias(String value) {
+		return value;
+	}
+
+	protected String getSqlPrimaryId(String value) {
+		return value;
+	}
+
+	protected String getSqlTableName(String value) {
+		return value;
 	}
 
 	/**
@@ -182,7 +194,7 @@ public abstract class AbstractStatementSQL implements SQLStatement {
 			if (assist.getCondition() != null && assist.getCondition().size() > 0) {
 				List<SqlWhereCondition<?>> where = assist.getCondition();
 				params = new JsonArray();
-				sql.append(" where " + where.get(0).getRequire());
+				sql.append(" where ").append(where.get(0).getRequire());
 				if (where.get(0).getValue() != null) {
 					params.add(where.get(0).getValue());
 				}
@@ -208,8 +220,8 @@ public abstract class AbstractStatementSQL implements SQLStatement {
 			}
 		}
 		SqlAndParams result = new SqlAndParams(sql.toString(), params);
-		if (LOG.isDebugEnabled()) {
-			LOG.debug("getCountSQL : " + result.toString());
+		if (this.getLOG().isDebugEnabled()) {
+			this.getLOG().debug("getCountSQL : " + result.toString());
 		}
 		return result;
 	}
@@ -219,8 +231,8 @@ public abstract class AbstractStatementSQL implements SQLStatement {
 		// 如果Assist为空返回默认默认查询语句,反则根据Assist生成语句sql语句
 		if (assist == null) {
 			SqlAndParams result = new SqlAndParams(String.format("select %s from %s ", getSqlResultColumns(), getSqlTableName()));
-			if (LOG.isDebugEnabled()) {
-				LOG.debug("SelectAllSQL : " + result.toString());
+			if (this.getLOG().isDebugEnabled()) {
+				this.getLOG().debug("SelectAllSQL : " + result.toString());
 			}
 			return result;
 		} else {
@@ -285,8 +297,8 @@ public abstract class AbstractStatementSQL implements SQLStatement {
 				}
 			}
 			SqlAndParams result = new SqlAndParams(sql.toString(), params);
-			if (LOG.isDebugEnabled()) {
-				LOG.debug("SelectAllSQL : " + result.toString());
+			if (this.getLOG().isDebugEnabled()) {
+				this.getLOG().debug("SelectAllSQL : " + result.toString());
 			}
 			return result;
 		}
@@ -299,8 +311,8 @@ public abstract class AbstractStatementSQL implements SQLStatement {
 		JsonArray params = new JsonArray();
 		params.add(primaryValue);
 		SqlAndParams result = new SqlAndParams(sql, params);
-		if (LOG.isDebugEnabled()) {
-			LOG.debug("selectByIdSQL : " + result.toString());
+		if (this.getLOG().isDebugEnabled()) {
+			this.getLOG().debug("selectByIdSQL : " + result.toString());
 		}
 		return result;
 	}
@@ -336,8 +348,8 @@ public abstract class AbstractStatementSQL implements SQLStatement {
 			sql.append(" LIMIT 1");
 		}
 		SqlAndParams result = new SqlAndParams(sql.toString(), params);
-		if (LOG.isDebugEnabled()) {
-			LOG.debug("selectByObjSQL : " + result.toString());
+		if (this.getLOG().isDebugEnabled()) {
+			this.getLOG().debug("selectByObjSQL : " + result.toString());
 		}
 		return result;
 	}
@@ -359,7 +371,7 @@ public abstract class AbstractStatementSQL implements SQLStatement {
 				tempValues = new StringBuilder("?");
 				params = new JsonArray();
 			} else {
-				tempColumn.append("," + pv.getName());
+				tempColumn.append(",").append(pv.getName());
 				tempValues.append(",?");
 			}
 			if (pv.getValue() != null) {
@@ -369,9 +381,9 @@ public abstract class AbstractStatementSQL implements SQLStatement {
 			}
 		}
 		String sql = String.format("insert into %s (%s) values (%s) ", getSqlTableName(), tempColumn, tempValues);
-		SqlAndParams result = new SqlAndParams(sql.toString(), params);
-		if (LOG.isDebugEnabled()) {
-			LOG.debug("insertAllSQL : " + result.toString());
+		SqlAndParams result = new SqlAndParams(sql, params);
+		if (this.getLOG().isDebugEnabled()) {
+			this.getLOG().debug("insertAllSQL : " + result.toString());
 		}
 		return result;
 	}
@@ -394,7 +406,7 @@ public abstract class AbstractStatementSQL implements SQLStatement {
 					tempValues = new StringBuilder("?");
 					params = new JsonArray();
 				} else {
-					tempColumn.append("," + pv.getName());
+					tempColumn.append(",").append(pv.getName());
 					tempValues.append(",?");
 				}
 				params.add(pv.getValue());
@@ -402,8 +414,8 @@ public abstract class AbstractStatementSQL implements SQLStatement {
 		}
 		String sql = String.format("insert into %s (%s) values (%s) ", getSqlTableName(), tempColumn, tempValues);
 		SqlAndParams result = new SqlAndParams(sql, params);
-		if (LOG.isDebugEnabled()) {
-			LOG.debug("insertNonEmptySQL : " + result.toString());
+		if (this.getLOG().isDebugEnabled()) {
+			this.getLOG().debug("insertNonEmptySQL : " + result.toString());
 		}
 		return result;
 	}
@@ -427,7 +439,7 @@ public abstract class AbstractStatementSQL implements SQLStatement {
 				tempColumn = new StringBuilder(pv.getName());
 				tempValues = new StringBuilder("?");
 			} else {
-				tempColumn.append("," + pv.getName());
+				tempColumn.append(",").append(pv.getName());
 				tempValues.append(",?");
 			}
 			param0.add(pv.getValue());
@@ -450,8 +462,8 @@ public abstract class AbstractStatementSQL implements SQLStatement {
 
 		String sql = String.format("insert into %s (%s) values (%s) ", getSqlTableName(), tempColumn, tempValues);
 		SqlAndParams qp = new SqlAndParams(sql, params);
-		if (LOG.isDebugEnabled()) {
-			LOG.debug("insertBatch : " + qp.toString());
+		if (this.getLOG().isDebugEnabled()) {
+			this.getLOG().debug("insertBatch : " + qp.toString());
 		}
 		return qp;
 	}
@@ -468,14 +480,14 @@ public abstract class AbstractStatementSQL implements SQLStatement {
 				tempColumn = new StringBuilder(column);
 				tempValues = new StringBuilder("?");
 			} else {
-				tempColumn.append("," + column);
+				tempColumn.append(",").append(column);
 				tempValues.append(",?");
 			}
 		}
 		String sql = String.format("insert into %s (%s) values (%s) ", getSqlTableName(), tempColumn, tempValues);
 		SqlAndParams qp = new SqlAndParams(sql, params);
-		if (LOG.isDebugEnabled()) {
-			LOG.debug("insertBatch : " + qp.toString());
+		if (this.getLOG().isDebugEnabled()) {
+			this.getLOG().debug("insertBatch : " + qp.toString());
 		}
 		return qp;
 	}
@@ -498,7 +510,7 @@ public abstract class AbstractStatementSQL implements SQLStatement {
 					tempValues = new StringBuilder("?");
 					params = new JsonArray();
 				} else {
-					tempColumn.append("," + pv.getName());
+					tempColumn.append(",").append(pv.getName());
 					tempValues.append(",?");
 				}
 				params.add(pv.getValue());
@@ -506,8 +518,8 @@ public abstract class AbstractStatementSQL implements SQLStatement {
 		}
 		String sql = String.format("replace into %s (%s) values (%s) ", getSqlTableName(), tempColumn, tempValues);
 		SqlAndParams result = new SqlAndParams(sql.toString(), params);
-		if (LOG.isDebugEnabled()) {
-			LOG.debug("replaceSQL : " + result.toString());
+		if (this.getLOG().isDebugEnabled()) {
+			this.getLOG().debug("replaceSQL : " + result.toString());
 		}
 		return result;
 	}
@@ -517,7 +529,7 @@ public abstract class AbstractStatementSQL implements SQLStatement {
 		if (getSqlPrimaryId() == null) {
 			return new SqlAndParams(false, "there is no primary key in your SQL statement");
 		}
-		JsonArray params = null;
+		JsonArray params = new JsonArray();
 		StringBuilder tempColumn = null;
 		Object tempIdValue = null;
 		List<SqlPropertyValue<?>> propertyValue;
@@ -532,10 +544,9 @@ public abstract class AbstractStatementSQL implements SQLStatement {
 				continue;
 			}
 			if (tempColumn == null) {
-				params = new JsonArray();
-				tempColumn = new StringBuilder(pv.getName() + " = ? ");
+				tempColumn = new StringBuilder(pv.getName()).append(" = ? ");
 			} else {
-				tempColumn.append(", " + pv.getName() + " = ? ");
+				tempColumn.append(", ").append(pv.getName()).append(" = ? ");
 			}
 			if (pv.getValue() != null) {
 				params.add(pv.getValue());
@@ -549,8 +560,8 @@ public abstract class AbstractStatementSQL implements SQLStatement {
 		params.add(tempIdValue);
 		String sql = String.format("update %s set %s where %s = ? ", getSqlTableName(), tempColumn, getSqlPrimaryId());
 		SqlAndParams result = new SqlAndParams(sql, params);
-		if (LOG.isDebugEnabled()) {
-			LOG.debug("updateAllByIdSQL : " + result.toString());
+		if (this.getLOG().isDebugEnabled()) {
+			this.getLOG().debug("updateAllByIdSQL : " + result.toString());
 		}
 		return result;
 	}
@@ -560,7 +571,7 @@ public abstract class AbstractStatementSQL implements SQLStatement {
 		if (assist == null || assist.getCondition() == null || assist.getCondition().size() < 1) {
 			return new SqlAndParams(false, "SqlAssist or SqlAssist.condition is null");
 		}
-		JsonArray params = null;
+		JsonArray params = new JsonArray();
 		StringBuilder tempColumn = null;
 		List<SqlPropertyValue<?>> propertyValue;
 		try {
@@ -570,10 +581,9 @@ public abstract class AbstractStatementSQL implements SQLStatement {
 		}
 		for (SqlPropertyValue<?> pv : propertyValue) {
 			if (tempColumn == null) {
-				params = new JsonArray();
-				tempColumn = new StringBuilder(pv.getName() + " = ? ");
+				tempColumn = new StringBuilder(pv.getName()).append(" = ? ");
 			} else {
-				tempColumn.append(", " + pv.getName() + " = ? ");
+				tempColumn.append(", ").append(pv.getName()).append(" = ? ");
 			}
 			if (pv.getValue() != null) {
 				params.add(pv.getValue());
@@ -602,10 +612,10 @@ public abstract class AbstractStatementSQL implements SQLStatement {
 				}
 			}
 		}
-		String sql = String.format("update %s set %s %s", getSqlTableName(), tempColumn, whereStr == null ? "" : whereStr);
+		String sql = String.format("update %s set %s %s", getSqlTableName(), tempColumn, whereStr);
 		SqlAndParams result = new SqlAndParams(sql.toString(), params);
-		if (LOG.isDebugEnabled()) {
-			LOG.debug("updateAllByAssistSQL : " + result.toString());
+		if (this.getLOG().isDebugEnabled()) {
+			this.getLOG().debug("updateAllByAssistSQL : " + result.toString());
 		}
 		return result;
 	}
@@ -613,8 +623,8 @@ public abstract class AbstractStatementSQL implements SQLStatement {
 	@Override
 	public <T> SqlAndParams updateNonEmptyByIdSQL(T obj) {
 		if (getSqlPrimaryId() == null) {
-			if (LOG.isDebugEnabled()) {
-				LOG.debug("there is no primary key in your SQL statement");
+			if (this.getLOG().isDebugEnabled()) {
+				this.getLOG().debug("there is no primary key in your SQL statement");
 			}
 			return new SqlAndParams(false, "there is no primary key in your SQL statement");
 		}
@@ -635,24 +645,24 @@ public abstract class AbstractStatementSQL implements SQLStatement {
 			if (pv.getValue() != null) {
 				if (tempColumn == null) {
 					params = new JsonArray();
-					tempColumn = new StringBuilder(pv.getName() + " = ? ");
+					tempColumn = new StringBuilder(pv.getName()).append(" = ? ");
 				} else {
-					tempColumn.append(", " + pv.getName() + " = ? ");
+					tempColumn.append(", ").append(pv.getName()).append(" = ? ");
 				}
 				params.add(pv.getValue());
 			}
 		}
 		if (tempColumn == null || tempIdValue == null) {
-			if (LOG.isDebugEnabled()) {
-				LOG.debug("there is no set update value or no primary key in your SQL statement");
+			if (this.getLOG().isDebugEnabled()) {
+				this.getLOG().debug("there is no set update value or no primary key in your SQL statement");
 			}
 			return new SqlAndParams(false, "there is no set update value or no primary key in your SQL statement");
 		}
 		params.add(tempIdValue);
 		String sql = String.format("update %s set %s where %s = ? ", getSqlTableName(), tempColumn, getSqlPrimaryId());
 		SqlAndParams result = new SqlAndParams(sql, params);
-		if (LOG.isDebugEnabled()) {
-			LOG.debug("updateNonEmptyByIdSQL : " + result.toString());
+		if (this.getLOG().isDebugEnabled()) {
+			this.getLOG().debug("updateNonEmptyByIdSQL : " + result.toString());
 		}
 		return result;
 	}
@@ -674,9 +684,9 @@ public abstract class AbstractStatementSQL implements SQLStatement {
 			if (pv.getValue() != null) {
 				if (tempColumn == null) {
 					params = new JsonArray();
-					tempColumn = new StringBuilder(pv.getName() + " = ? ");
+					tempColumn = new StringBuilder(pv.getName()).append(" = ? ");
 				} else {
-					tempColumn.append(", " + pv.getName() + " = ? ");
+					tempColumn.append(", ").append(pv.getName()).append(" = ? ");
 				}
 				params.add(pv.getValue());
 			}
@@ -707,9 +717,9 @@ public abstract class AbstractStatementSQL implements SQLStatement {
 			}
 		}
 		String sql = String.format("update %s set %s %s", getSqlTableName(), tempColumn, whereStr);
-		SqlAndParams result = new SqlAndParams(sql.toString(), params);
-		if (LOG.isDebugEnabled()) {
-			LOG.debug("updateNonEmptyByAssistSQL : " + result.toString());
+		SqlAndParams result = new SqlAndParams(sql, params);
+		if (this.getLOG().isDebugEnabled()) {
+			this.getLOG().debug("updateNonEmptyByAssistSQL : " + result.toString());
 		}
 		return result;
 	}
@@ -724,16 +734,16 @@ public abstract class AbstractStatementSQL implements SQLStatement {
 			return new SqlAndParams(false, "Columns cannot be null or empty");
 		}
 		StringBuilder setStr = new StringBuilder();
-		setStr.append(" " + columns.get(0) + " = null ");
+		setStr.append(" ").append(columns.get(0)).append(" = null ");
 		for (int i = 1; i < columns.size(); i++) {
-			setStr.append(", " + columns.get(i) + " = null ");
+			setStr.append(", ").append(columns.get(i)).append(" = null ");
 		}
 		String sql = String.format("update %s set %s where %s = ? ", getSqlTableName(), setStr.toString(), getSqlPrimaryId());
 		JsonArray params = new JsonArray();
 		params.add(primaryValue);
 		SqlAndParams result = new SqlAndParams(sql, params);
-		if (LOG.isDebugEnabled()) {
-			LOG.debug("updateSetNullById : " + result.toString());
+		if (this.getLOG().isDebugEnabled()) {
+			this.getLOG().debug("updateSetNullById : " + result.toString());
 		}
 		return result;
 	}
@@ -747,9 +757,9 @@ public abstract class AbstractStatementSQL implements SQLStatement {
 			return new SqlAndParams(false, "Columns cannot be null or empty");
 		}
 		StringBuilder setStr = new StringBuilder();
-		setStr.append(" " + columns.get(0) + " = null ");
+		setStr.append(" ").append(columns.get(0)).append(" = null ");
 		for (int i = 1; i < columns.size(); i++) {
-			setStr.append(", " + columns.get(i) + " = null ");
+			setStr.append(", ").append(columns.get(i)).append(" = null ");
 		}
 		JsonArray params = new JsonArray();
 		List<SqlWhereCondition<?>> where = assist.getCondition();
@@ -775,8 +785,8 @@ public abstract class AbstractStatementSQL implements SQLStatement {
 		}
 		String sql = String.format("update %s set %s %s", getSqlTableName(), setStr.toString(), whereStr);
 		SqlAndParams result = new SqlAndParams(sql.toString(), params);
-		if (LOG.isDebugEnabled()) {
-			LOG.debug("updateSetNullByAssist : " + result.toString());
+		if (this.getLOG().isDebugEnabled()) {
+			this.getLOG().debug("updateSetNullByAssist : " + result.toString());
 		}
 		return result;
 	}
@@ -790,8 +800,8 @@ public abstract class AbstractStatementSQL implements SQLStatement {
 		JsonArray params = new JsonArray();
 		params.add(primaryValue);
 		SqlAndParams result = new SqlAndParams(sql, params);
-		if (LOG.isDebugEnabled()) {
-			LOG.debug("deleteByIdSQL : " + result.toString());
+		if (this.getLOG().isDebugEnabled()) {
+			this.getLOG().debug("deleteByIdSQL : " + result.toString());
 		}
 		return result;
 	}
@@ -825,10 +835,11 @@ public abstract class AbstractStatementSQL implements SQLStatement {
 		}
 		String sql = String.format("delete from %s %s", getSqlTableName(), whereStr);
 		SqlAndParams result = new SqlAndParams(sql, params);
-		if (LOG.isDebugEnabled()) {
-			LOG.debug("deleteByAssistSQL : " + result.toString());
+		if (this.getLOG().isDebugEnabled()) {
+			this.getLOG().debug("deleteByAssistSQL : " + result.toString());
 		}
 		return result;
 	}
 
+	protected abstract Logger getLOG();
 }

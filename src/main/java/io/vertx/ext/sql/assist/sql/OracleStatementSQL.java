@@ -23,7 +23,7 @@ public class OracleStatementSQL extends AbstractStatementSQL {
 	}
 
 	/** 日志工具 */
-	private final Logger LOG = LoggerFactory.getLogger(OracleStatementSQL.class);
+	private static final Logger LOG = LoggerFactory.getLogger(OracleStatementSQL.class);
 
 	@Override
 	public SqlAndParams selectAllSQL(SqlAssist assist) {
@@ -135,6 +135,41 @@ public class OracleStatementSQL extends AbstractStatementSQL {
 			LOG.debug("selectByObjSQL : " + result.toString());
 		}
 		return result;
+	}
+
+	@Override
+	public <T> SqlAndParams upsertAllSQL(T obj) {
+		throw new UnsupportedOperationException("未实现");
+	}
+
+	@Override
+	public <T> SqlAndParams insertAllSQLReturnId(T obj) {
+		throw new UnsupportedOperationException("未实现");
+	}
+
+	@Override
+	public <T> SqlAndParams upsertAllSQLReturnId(T obj) {
+		throw new UnsupportedOperationException("未实现");
+	}
+
+	@Override
+	public <T> SqlAndParams upsertNonEmptySQL(T obj) {
+		throw new UnsupportedOperationException("未实现");
+	}
+
+	@Override
+	public <T> SqlAndParams insertNonEmptySQLReturnId(T obj) {
+		throw new UnsupportedOperationException("未实现");
+	}
+
+	@Override
+	public <T> SqlAndParams upsertNonEmptySQLReturnId(T obj) {
+		throw new UnsupportedOperationException("未实现");
+	}
+
+	@Override
+	protected Logger getLOG() {
+		return LOG;
 	}
 
 }

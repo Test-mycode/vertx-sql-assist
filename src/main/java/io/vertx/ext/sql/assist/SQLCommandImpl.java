@@ -1,164 +1,202 @@
 package io.vertx.ext.sql.assist;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
-import io.vertx.core.Handler;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
+
 /**
  * 数据库命令执行器的默认实现
- * 
- * @author <a href="http://szmirren.com">Mirren</a>
  *
+ * @author <a href="http://szmirren.com">Mirren</a>
  */
 public class SQLCommandImpl implements SQLCommand {
-	/** 语句 */
-	private SQLStatement statement;
-	/** 执行器 */
-	private SQLExecute<?> execute;
-	/**
-	 * 初始化
-	 * 
-	 * @param statement
-	 * @param execute
-	 */
-	public SQLCommandImpl(SQLStatement statement, SQLExecute<?> execute) {
-		super();
-		this.statement = statement;
-		this.execute = execute;
-	}
+    /**
+     * 语句
+     */
+    private SQLStatement statement;
+    /**
+     * 执行器
+     */
+    private SQLExecute<?> execute;
+
+    /**
+     * 初始化
+     *
+     * @param statement
+     * @param execute
+     */
+    public SQLCommandImpl(SQLStatement statement, SQLExecute<?> execute) {
+        super();
+        this.statement = statement;
+        this.execute = execute;
+    }
+
+    @Override
+    public Future<Long> getCount(SqlAssist assist) {
+        SqlAndParams qp = statement.getCountSQL(assist);
+
+        return execute.queryAsListArray(qp).compose(rows -> {
+            if (rows != null && !rows.isEmpty()) {
+                Object value = rows.get(0).getValue(0);
+                if (value instanceof Number) {
+                    return Future.succeededFuture(((Number) value).longValue());
+                } else {
+                    return Future.succeededFuture(0L);
+                }
+            } else {
+                return Future.succeededFuture(0L);
+            }
+        });
+    }
+
+    @Override
+    public Future<List<JsonObject>> selectAll(SqlAssist assist) {
+        SqlAndParams qp = statement.selectAllSQL(assist);
+        return execute.queryAsListObj(qp);
+    }
+
+    @Override
+    public <S> Future<JsonObject> selectById(S primaryValue, String resultColumns, String joinOrReference) {
+        SqlAndParams qp = statement.selectByIdSQL(primaryValue, resultColumns, joinOrReference);
+        return execute.queryAsObj(qp);
+    }
+
+    @Override
+    public <T> Future<JsonObject> selectSingleByObj(T obj, String resultColumns, String joinOrReference) {
+        SqlAndParams qp = statement.selectByObjSQL(obj, resultColumns, joinOrReference, true);
+        return execute.queryAsObj(qp);
+    }
+
+    @Override
+    public <T> Future<List<JsonObject>> selectByObj(T obj, String resultColumns, String joinOrReference) {
+        SqlAndParams qp = statement.selectByObjSQL(obj, resultColumns, joinOrReference, false);
+        return execute.queryAsListObj(qp);
+    }
+
+    @Override
+    public <T> Future<Integer> insertAll(T obj) {
+        SqlAndParams qp = statement.insertAllSQL(obj);
+        return execute.update(qp);
+    }
+
 	@Override
-	public void getCount(SqlAssist assist, Handler<AsyncResult<Long>> handler) {
-		SqlAndParams qp = statement.getCountSQL(assist);
-		execute.queryAsListArray(qp, set -> {
-			if (set.succeeded()) {
-				List<JsonArray> rows = set.result();
-				if (rows != null && rows.size() >= 0) {
-					Object value = rows.get(0).getValue(0);
-					if (value instanceof Number) {
-						handler.handle(Future.succeededFuture(((Number) value).longValue()));
-					} else {
-						handler.handle(Future.succeededFuture(0L));
-					}
-				} else {
-					handler.handle(Future.succeededFuture(0L));
-				}
-			} else {
-				handler.handle(Future.failedFuture(set.cause()));
-			}
-		});
+	public <T> Future<Integer> upsertAll(T obj) {
+		SqlAndParams qp = statement.upsertAllSQL(obj);
+		return execute.update(qp);
 	}
+
 	@Override
-	public void selectAll(SqlAssist assist, Handler<AsyncResult<List<JsonObject>>> handler) {
-		SqlAndParams qp = statement.selectAllSQL(assist);
-		execute.queryAsListObj(qp, handler);
-	}
+    public <T> Future<JsonArray> insertAllReturnId(T obj) {
+        SqlAndParams qp = statement.insertAllSQLReturnId(obj);
+        return execute.insert(qp);
+    }
+
 	@Override
-	public <S> void selectById(S primaryValue, String resultColumns, String joinOrReference, Handler<AsyncResult<JsonObject>> handler) {
-		SqlAndParams qp = statement.selectByIdSQL(primaryValue, resultColumns, joinOrReference);
-		execute.queryAsObj(qp, handler);
+	public <T> Future<JsonArray> upsertAllReturnId(T obj) {
+		SqlAndParams qp = statement.upsertAllSQLReturnId(obj);
+		return execute.insert(qp);
 	}
+
 	@Override
-	public <T> void selectSingleByObj(T obj, String resultColumns, String joinOrReference, Handler<AsyncResult<JsonObject>> handler) {
-		SqlAndParams qp = statement.selectByObjSQL(obj, resultColumns, joinOrReference, true);
-		execute.queryAsObj(qp, handler);
-	}
+    public <T> Future<Integer> insertNonEmpty(T obj) {
+        SqlAndParams qp = statement.insertNonEmptySQL(obj);
+        return execute.update(qp);
+    }
+
 	@Override
-	public <T> void selectByObj(T obj, String resultColumns, String joinOrReference, Handler<AsyncResult<List<JsonObject>>> handler) {
-		SqlAndParams qp = statement.selectByObjSQL(obj, resultColumns, joinOrReference, false);
-		execute.queryAsListObj(qp, handler);
+	public <T> Future<Integer> upsertNonEmpty(T obj) {
+		SqlAndParams qp = statement.upsertNonEmptySQL(obj);
+		return execute.update(qp);
 	}
+
 	@Override
-	public <T> void insertAll(T obj, Handler<AsyncResult<Integer>> handler) {
-		SqlAndParams qp = statement.insertAllSQL(obj);
-		execute.update(qp, handler);
-	}
+    public <T> Future<JsonArray> insertNonEmptyReturnId(T obj) {
+        SqlAndParams qp = statement.insertNonEmptySQLReturnId(obj);
+        return execute.insert(qp);
+    }
+
 	@Override
-	public <T> void insertNonEmpty(T obj, Handler<AsyncResult<Integer>> handler) {
-		SqlAndParams qp = statement.insertNonEmptySQL(obj);
-		execute.update(qp, handler);
+	public <T> Future<JsonArray> upsertNonEmptyReturnId(T obj) {
+		SqlAndParams qp = statement.upsertNonEmptySQLReturnId(obj);
+		return execute.insert(qp);
 	}
+
+
 	@Override
-	public <T> void insertBatch(List<T> list, Handler<AsyncResult<Long>> handler) {
-		SqlAndParams qp = statement.insertBatchSQL(list);
-		if (qp.succeeded()) {
-			execute.batch(qp, res -> {
-				if (res.succeeded()) {
-					List<Integer> result = res.result() == null ? new ArrayList<>() : res.result();
-					long count = result.stream().count();
-					handler.handle(Future.succeededFuture(count));
-				} else {
-					handler.handle(Future.failedFuture(res.cause()));
-				}
-			});
-		} else {
-			handler.handle(Future.succeededFuture(0L));
-		}
-	}
-	@Override
-	public void insertBatch(List<String> columns, List<JsonArray> params, Handler<AsyncResult<Long>> handler) {
-		SqlAndParams qp = statement.insertBatchSQL(columns, params);
-		if (qp.succeeded()) {
-			execute.batch(qp, res -> {
-				if (res.succeeded()) {
-					List<Integer> result = res.result() == null ? new ArrayList<>() : res.result();
-					long count = result.stream().count();
-					handler.handle(Future.succeededFuture(count));
-				} else {
-					handler.handle(Future.failedFuture(res.cause()));
-				}
-			});
-		} else {
-			handler.handle(Future.succeededFuture(0L));
-		}
-	}
-	@Override
-	public <T> void replace(T obj, Handler<AsyncResult<Integer>> handler) {
-		SqlAndParams qp = statement.replaceSQL(obj);
-		execute.update(qp, handler);
-	}
-	@Override
-	public <T> void updateAllById(T obj, Handler<AsyncResult<Integer>> handler) {
-		SqlAndParams qp = statement.updateAllByIdSQL(obj);
-		execute.update(qp, handler);
-	}
-	@Override
-	public <T> void updateAllByAssist(T obj, SqlAssist assist, Handler<AsyncResult<Integer>> handler) {
-		SqlAndParams qp = statement.updateAllByAssistSQL(obj, assist);
-		execute.update(qp, handler);
-	}
-	@Override
-	public <T> void updateNonEmptyById(T obj, Handler<AsyncResult<Integer>> handler) {
-		SqlAndParams qp = statement.updateNonEmptyByIdSQL(obj);
-		execute.update(qp, handler);
-	}
-	@Override
-	public <T> void updateNonEmptyByAssist(T obj, SqlAssist assist, Handler<AsyncResult<Integer>> handler) {
-		SqlAndParams qp = statement.updateNonEmptyByAssistSQL(obj, assist);
-		execute.update(qp, handler);
-	}
-	@Override
-	public <S> void updateSetNullById(S primaryValue, List<String> columns, Handler<AsyncResult<Integer>> handler) {
-		SqlAndParams qp = statement.updateSetNullByIdSQL(primaryValue, columns);
-		execute.update(qp, handler);
-	}
-	@Override
-	public <T> void updateSetNullByAssist(SqlAssist assist, List<String> columns, Handler<AsyncResult<Integer>> handler) {
-		SqlAndParams qp = statement.updateSetNullByAssistSQL(assist, columns);
-		execute.update(qp, handler);
-	}
-	@Override
-	public <S> void deleteById(S primaryValue, Handler<AsyncResult<Integer>> handler) {
-		SqlAndParams qp = statement.deleteByIdSQL(primaryValue);
-		execute.update(qp, handler);
-	}
-	@Override
-	public void deleteByAssist(SqlAssist assist, Handler<AsyncResult<Integer>> handler) {
-		SqlAndParams qp = statement.deleteByAssistSQL(assist);
-		execute.update(qp, handler);
-	}
+    public <T> Future<Long> insertBatch(List<T> list) {
+        SqlAndParams qp = statement.insertBatchSQL(list);
+        if (qp.succeeded()) {
+            return execute.batch(qp)
+                    .map(rows -> (long) rows.size());
+        } else {
+            return Future.succeededFuture(0L);
+        }
+    }
+
+    @Override
+    public Future<Long> insertBatch(List<String> columns, List<JsonArray> params) {
+        SqlAndParams qp = statement.insertBatchSQL(columns, params);
+        if (qp.succeeded()) {
+            return execute.batch(qp).map(rows -> (long) rows.size());
+        } else {
+            return Future.succeededFuture(0L);
+        }
+    }
+
+    @Override
+    public <T> Future<Integer> replace(T obj) {
+        SqlAndParams qp = statement.replaceSQL(obj);
+        return execute.update(qp);
+    }
+
+    @Override
+    public <T> Future<Integer> updateAllById(T obj) {
+        SqlAndParams qp = statement.updateAllByIdSQL(obj);
+        return execute.update(qp);
+    }
+
+    @Override
+    public <T> Future<Integer> updateAllByAssist(T obj, SqlAssist assist) {
+        SqlAndParams qp = statement.updateAllByAssistSQL(obj, assist);
+        return execute.update(qp);
+    }
+
+    @Override
+    public <T> Future<Integer> updateNonEmptyById(T obj) {
+        SqlAndParams qp = statement.updateNonEmptyByIdSQL(obj);
+        return execute.update(qp);
+    }
+
+    @Override
+    public <T> Future<Integer> updateNonEmptyByAssist(T obj, SqlAssist assist) {
+        SqlAndParams qp = statement.updateNonEmptyByAssistSQL(obj, assist);
+        return execute.update(qp);
+    }
+
+    @Override
+    public <S> Future<Integer> updateSetNullById(S primaryValue, List<String> columns) {
+        SqlAndParams qp = statement.updateSetNullByIdSQL(primaryValue, columns);
+        return execute.update(qp);
+    }
+
+    @Override
+    public <T> Future<Integer> updateSetNullByAssist(SqlAssist assist, List<String> columns) {
+        SqlAndParams qp = statement.updateSetNullByAssistSQL(assist, columns);
+        return execute.update(qp);
+    }
+
+    @Override
+    public <S> Future<Integer> deleteById(S primaryValue) {
+        SqlAndParams qp = statement.deleteByIdSQL(primaryValue);
+        return execute.update(qp);
+    }
+
+    @Override
+    public Future<Integer> deleteByAssist(SqlAssist assist) {
+        SqlAndParams qp = statement.deleteByAssistSQL(assist);
+        return execute.update(qp);
+    }
 
 }

@@ -3,8 +3,7 @@ package io.vertx.ext.sql.assist;
 import java.lang.reflect.ParameterizedType;
 import java.util.List;
 
-import io.vertx.core.AsyncResult;
-import io.vertx.core.Handler;
+import io.vertx.core.Future;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 
@@ -26,8 +25,6 @@ public abstract class CommonSQL<E, C> implements CommonSQLClinet<C> {
 
 	/**
 	 * 使用以注册或默认的{@link SQLStatement}
-	 * 
-	 * @param entityClz
 	 *          实体类,类必须包含{@link Table} {@link TableId} {@link TableColumn}注解
 	 * @param execute
 	 *          执行器
@@ -63,163 +60,193 @@ public abstract class CommonSQL<E, C> implements CommonSQLClinet<C> {
 	}
 
 	@Override
-	public void queryAsObj(SqlAndParams qp, Handler<AsyncResult<JsonObject>> handler) {
-		execute.queryAsObj(qp, handler);
+	public Future<JsonObject> queryAsObj(SqlAndParams qp) {
+		return execute.queryAsObj(qp);
 	}
 
 	@Override
-	public void queryAsListObj(SqlAndParams qp, Handler<AsyncResult<List<JsonObject>>> handler) {
-		execute.queryAsListObj(qp, handler);
+	public Future<List<JsonObject>> queryAsListObj(SqlAndParams qp) {
+		return execute.queryAsListObj(qp);
 	}
 
 	@Override
-	public void queryAsListArray(SqlAndParams qp, Handler<AsyncResult<List<JsonArray>>> handler) {
-		execute.queryAsListArray(qp, handler);
+	public Future<List<JsonArray>> queryAsListArray(SqlAndParams qp) {
+		return execute.queryAsListArray(qp);
 	}
 
 	@Override
-	public void update(SqlAndParams qp, Handler<AsyncResult<Integer>> handler) {
-		execute.update(qp, handler);
+	public Future<Integer> update(SqlAndParams qp) {
+		return execute.update(qp);
 	}
 
 	@Override
-	public void batch(SqlAndParams qp, Handler<AsyncResult<List<Integer>>> handler) {
-		execute.batch(qp, handler);
+	public Future<List<Integer>> batch(SqlAndParams qp) {
+		return execute.batch(qp);
 	}
 
 	@Override
-	public void getCount(Handler<AsyncResult<Long>> handler) {
-		command.getCount(handler);
+	public Future<Long> getCount() {
+		return command.getCount();
 	}
 
 	@Override
-	public void getCount(SqlAssist assist, Handler<AsyncResult<Long>> handler) {
-		command.getCount(assist, handler);
+	public Future<Long> getCount(SqlAssist assist) {
+		return command.getCount(assist);
 	}
 
 	@Override
-	public void selectAll(Handler<AsyncResult<List<JsonObject>>> handler) {
-		command.selectAll(handler);
+	public Future<List<JsonObject>> selectAll() {
+		return command.selectAll();
 	}
 
 	@Override
-	public void selectAll(SqlAssist assist, Handler<AsyncResult<List<JsonObject>>> handler) {
-		command.selectAll(assist, handler);
+	public Future<List<JsonObject>> selectAll(SqlAssist assist) {
+		return command.selectAll(assist);
 	}
 
 	@Override
-	public void limitAll(SqlAssist assist, Handler<AsyncResult<JsonObject>> handler) {
-		command.limitAll(assist, handler);
+	public Future<JsonObject> limitAll(SqlAssist assist) {
+		return command.limitAll(assist);
 	}
 
 	@Override
-	public <S> void selectById(S primaryValue, Handler<AsyncResult<JsonObject>> handler) {
-		command.selectById(primaryValue, handler);
+	public <S> Future<JsonObject> selectById(S primaryValue) {
+		return command.selectById(primaryValue);
 	}
 
 	@Override
-	public <S> void selectById(S primaryValue, String resultColumns, Handler<AsyncResult<JsonObject>> handler) {
-		command.selectById(primaryValue, resultColumns, handler);
+	public <S> Future<JsonObject> selectById(S primaryValue, String resultColumns) {
+		return command.selectById(primaryValue, resultColumns);
 	}
 
 	@Override
-	public <S> void selectById(S primaryValue, String resultColumns, String joinOrReference, Handler<AsyncResult<JsonObject>> handler) {
-		command.selectById(primaryValue, resultColumns, joinOrReference, handler);
+	public <S> Future<JsonObject> selectById(S primaryValue, String resultColumns, String joinOrReference) {
+		return command.selectById(primaryValue, resultColumns, joinOrReference);
 	}
 
 	@Override
-	public <T> void selectSingleByObj(T obj, Handler<AsyncResult<JsonObject>> handler) {
-		command.selectSingleByObj(obj, handler);
+	public <T> Future<JsonObject> selectSingleByObj(T obj) {
+		return command.selectSingleByObj(obj);
 	}
 
 	@Override
-	public <T> void selectSingleByObj(T obj, String resultColumns, Handler<AsyncResult<JsonObject>> handler) {
-		command.selectSingleByObj(obj, resultColumns, handler);
+	public <T> Future<JsonObject> selectSingleByObj(T obj, String resultColumns) {
+		return command.selectSingleByObj(obj, resultColumns);
 	}
 
 	@Override
-	public <T> void selectSingleByObj(T obj, String resultColumns, String joinOrReference, Handler<AsyncResult<JsonObject>> handler) {
-		command.selectSingleByObj(obj, resultColumns, joinOrReference, handler);
+	public <T> Future<JsonObject> selectSingleByObj(T obj, String resultColumns, String joinOrReference) {
+		return command.selectSingleByObj(obj, resultColumns, joinOrReference);
 	}
 
 	@Override
-	public <T> void selectByObj(T obj, Handler<AsyncResult<List<JsonObject>>> handler) {
-		command.selectByObj(obj, handler);
+	public <T> Future<List<JsonObject>> selectByObj(T obj) {
+		return command.selectByObj(obj);
 	}
 
 	@Override
-	public <T> void selectByObj(T obj, String resultColumns, Handler<AsyncResult<List<JsonObject>>> handler) {
-		command.selectByObj(obj, resultColumns, handler);
+	public <T> Future<List<JsonObject>> selectByObj(T obj, String resultColumns) {
+		return command.selectByObj(obj, resultColumns);
 	}
 
 	@Override
-	public <T> void selectByObj(T obj, String resultColumns, String joinOrReference, Handler<AsyncResult<List<JsonObject>>> handler) {
-		command.selectByObj(obj, resultColumns, joinOrReference, handler);
+	public <T> Future<List<JsonObject>> selectByObj(T obj, String resultColumns, String joinOrReference) {
+		return command.selectByObj(obj, resultColumns, joinOrReference);
 	}
 
 	@Override
-	public <T> void insertAll(T obj, Handler<AsyncResult<Integer>> handler) {
-		command.insertAll(obj, handler);
+	public <T> Future<Integer> insertAll(T obj) {
+		return command.insertAll(obj);
 	}
 
 	@Override
-	public <T> void insertNonEmpty(T obj, Handler<AsyncResult<Integer>> handler) {
-		command.insertNonEmpty(obj, handler);
+	public <T> Future<Integer> upsertAll(T obj) {
+		return command.upsertAll(obj);
 	}
 
 	@Override
-	public <T> void insertBatch(List<T> list, Handler<AsyncResult<Long>> handler) {
-		command.insertBatch(list, handler);
+	public <T> Future<JsonArray> insertAllReturnId(T obj) {
+		return command.insertAllReturnId(obj);
 	}
 
 	@Override
-	public void insertBatch(List<String> columns, List<JsonArray> params, Handler<AsyncResult<Long>> handler) {
-		command.insertBatch(columns, params, handler);
+	public <T> Future<JsonArray> upsertAllReturnId(T obj) {
+		return command.upsertAllReturnId(obj);
 	}
 
 	@Override
-	public <T> void replace(T obj, Handler<AsyncResult<Integer>> handler) {
-		command.replace(obj, handler);
+	public <T> Future<Integer> insertNonEmpty(T obj) {
+		return command.insertNonEmpty(obj);
 	}
 
 	@Override
-	public <T> void updateAllById(T obj, Handler<AsyncResult<Integer>> handler) {
-		command.updateAllById(obj, handler);
+	public <T> Future<Integer> upsertNonEmpty(T obj) {
+		return command.upsertNonEmpty(obj);
 	}
 
 	@Override
-	public <T> void updateAllByAssist(T obj, SqlAssist assist, Handler<AsyncResult<Integer>> handler) {
-		command.updateAllByAssist(obj, assist, handler);
+	public <T> Future<JsonArray> insertNonEmptyReturnId(T obj) {
+		return command.insertNonEmptyReturnId(obj);
 	}
 
 	@Override
-	public <T> void updateNonEmptyById(T obj, Handler<AsyncResult<Integer>> handler) {
-		command.updateNonEmptyById(obj, handler);
+	public <T> Future<JsonArray> upsertNonEmptyReturnId(T obj) {
+		return command.upsertNonEmptyReturnId(obj);
 	}
 
 	@Override
-	public <T> void updateNonEmptyByAssist(T obj, SqlAssist assist, Handler<AsyncResult<Integer>> handler) {
-		command.updateNonEmptyByAssist(obj, assist, handler);
+	public <T> Future<Long> insertBatch(List<T> list) {
+		return command.insertBatch(list);
 	}
 
 	@Override
-	public <S> void updateSetNullById(S primaryValue, List<String> columns, Handler<AsyncResult<Integer>> handler) {
-		command.updateSetNullById(primaryValue, columns, handler);
+	public Future<Long> insertBatch(List<String> columns, List<JsonArray> params) {
+		return command.insertBatch(columns, params);
 	}
 
 	@Override
-	public <T> void updateSetNullByAssist(SqlAssist assist, List<String> columns, Handler<AsyncResult<Integer>> handler) {
-		command.updateSetNullByAssist(assist, columns, handler);
+	public <T> Future<Integer> replace(T obj) {
+		return command.replace(obj);
 	}
 
 	@Override
-	public <S> void deleteById(S primaryValue, Handler<AsyncResult<Integer>> handler) {
-		command.deleteById(primaryValue, handler);
+	public <T> Future<Integer> updateAllById(T obj) {
+		return command.updateAllById(obj);
 	}
 
 	@Override
-	public void deleteByAssist(SqlAssist assist, Handler<AsyncResult<Integer>> handler) {
-		command.deleteByAssist(assist, handler);
+	public <T> Future<Integer> updateAllByAssist(T obj, SqlAssist assist) {
+		return command.updateAllByAssist(obj, assist);
+	}
+
+	@Override
+	public <T> Future<Integer> updateNonEmptyById(T obj) {
+		return command.updateNonEmptyById(obj);
+	}
+
+	@Override
+	public <T> Future<Integer> updateNonEmptyByAssist(T obj, SqlAssist assist) {
+		return command.updateNonEmptyByAssist(obj, assist);
+	}
+
+	@Override
+	public <S> Future<Integer> updateSetNullById(S primaryValue, List<String> columns) {
+		return command.updateSetNullById(primaryValue, columns);
+	}
+
+	@Override
+	public <T> Future<Integer> updateSetNullByAssist(SqlAssist assist, List<String> columns) {
+		return command.updateSetNullByAssist(assist, columns);
+	}
+
+	@Override
+	public <S> Future<Integer> deleteById(S primaryValue) {
+		return command.deleteById(primaryValue);
+	}
+
+	@Override
+	public Future<Integer> deleteByAssist(SqlAssist assist) {
+		return command.deleteByAssist(assist);
 	}
 
 }

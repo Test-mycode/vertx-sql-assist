@@ -6,13 +6,13 @@ import java.util.List;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
+import io.vertx.core.Promise;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
+import io.vertx.core.logging.Logger;
+import io.vertx.mysqlclient.MySQLClient;
 import io.vertx.pgclient.PgPool;
-import io.vertx.sqlclient.Row;
-import io.vertx.sqlclient.RowSet;
-import io.vertx.sqlclient.SqlConnection;
-import io.vertx.sqlclient.Tuple;
+import io.vertx.sqlclient.*;
 
 /**
  * JDBCClient版的SQL实现
@@ -32,82 +32,86 @@ public class SQLExecutePgImpl implements SQLExecute<PgPool> {
 	public PgPool getClient() {
 		return client;
 	}
+
 	@Override
-	public void queryAsObj(SqlAndParams qp, Handler<AsyncResult<JsonObject>> handler) {
-		queryExecute(qp, query -> {
-			if (query.succeeded()) {
-				RowSet<Row> result = query.result();
-				List<String> names = result.columnsNames();
-				List<JsonObject> rows = new ArrayList<>();
-				for (Row row : result) {
-					JsonObject data = new JsonObject();
-					for (int i = 0; i < names.size(); i++) {
-						data.put(names.get(i), row.getValue(i));
+	public void setLogger(Logger logger) {
+
+	}
+
+	@Override
+	public Future<JsonObject> queryAsObj(SqlAndParams qp) {
+		return this.queryExecute(qp)
+				.map(result -> {
+					List<String> names = result.columnsNames();
+					List<JsonObject> rows = new ArrayList<>();
+					for (Row row : result) {
+						JsonObject data = new JsonObject();
+						for (int i = 0; i < names.size(); i++) {
+							data.put(names.get(i), row.getValue(i));
+						}
+						rows.add(data);
 					}
-					rows.add(data);
-				}
-				if (rows != null && rows.size() > 0) {
-					handler.handle(Future.succeededFuture(rows.get(0)));
-				} else {
-					handler.handle(Future.succeededFuture());
-				}
-			} else {
-				handler.handle(Future.failedFuture(query.cause()));
-			}
-		});
-	}
-	@Override
-	public void queryAsListObj(SqlAndParams qp, Handler<AsyncResult<List<JsonObject>>> handler) {
-		queryExecute(qp, query -> {
-			if (query.succeeded()) {
-				RowSet<Row> result = query.result();
-				List<String> names = result.columnsNames();
-				List<JsonObject> rows = new ArrayList<>();
-				for (Row row : result) {
-					JsonObject data = new JsonObject();
-					for (int i = 0; i < names.size(); i++) {
-						data.put(names.get(i), row.getValue(i));
+					if (rows.size() > 0) {
+						return rows.get(0);
+					} else {
+						return null;
 					}
-					rows.add(data);
+				});
+	}
+
+	@Override
+	public Future<List<JsonObject>> queryAsListObj(SqlAndParams qp) {
+		return this.queryExecute(qp).map(result -> {
+			List<String> names = result.columnsNames();
+			List<JsonObject> rows = new ArrayList<>();
+			for (Row row : result) {
+				JsonObject data = new JsonObject();
+				for (int i = 0; i < names.size(); i++) {
+					data.put(names.get(i), row.getValue(i));
 				}
-				handler.handle(Future.succeededFuture(rows));
-			} else {
-				handler.handle(Future.failedFuture(query.cause()));
+				rows.add(data);
 			}
+			return rows;
 		});
 	}
+
 	@Override
-	public void queryAsListArray(SqlAndParams qp, Handler<AsyncResult<List<JsonArray>>> handler) {
-		queryExecute(qp, query -> {
-			if (query.succeeded()) {
-				RowSet<Row> result = query.result();
-				List<JsonArray> rows = new ArrayList<>();
-				for (Row row : result) {
-					JsonArray data = new JsonArray();
-					for (int i = 0; i < row.size(); i++) {
-						data.add(row.getValue(i));
+	public Future<List<JsonArray>> queryAsListArray(SqlAndParams qp) {
+		return this.queryExecute(qp).map(result->{
+			List<JsonArray> rows = new ArrayList<>();
+			for (Row row : result) {
+				JsonArray data = new JsonArray();
+				for (int i = 0; i < row.size(); i++) {
+					data.add(row.getValue(i));
+				}
+				rows.add(data);
+			}
+			return rows;
+		});
+	}
+
+	@Override
+	public Future<JsonArray> insert(SqlAndParams qp) {
+		return this.queryExecute(qp)
+				.map(res-> {
+					JsonArray result =new JsonArray();
+					for(Row rows: res) {
+						for(String column:res.columnsNames())
+							result.add(rows.getValue(column));
+						break;
 					}
-					rows.add(data);
-				}
-				handler.handle(Future.succeededFuture(rows));
-			} else {
-				handler.handle(Future.failedFuture(query.cause()));
-			}
-		});
+					return result;
+				});
 	}
+
 	@Override
-	public void update(SqlAndParams qp, Handler<AsyncResult<Integer>> handler) {
-		updateExecute(qp, result -> {
-			if (result.succeeded()) {
-				int updated = result.result().rowCount();
-				handler.handle(Future.succeededFuture(updated));
-			} else {
-				handler.handle(Future.failedFuture(result.cause()));
-			}
-		});
+	public Future<Integer> update(SqlAndParams qp) {
+		return updateExecute(qp).map(SqlResult::rowCount);
 	}
+
 	@Override
-	public void batch(SqlAndParams qp, Handler<AsyncResult<List<Integer>>> handler) {
+	public Future<List<Integer>> batch(SqlAndParams qp) {
+		Promise<List<Integer>> result = Promise.promise();
 		if (qp.succeeded()) {
 			client.getConnection(conn -> {
 				if (conn.succeeded()) {
@@ -119,59 +123,67 @@ public class SQLExecutePgImpl implements SQLExecute<PgPool> {
 						List<Object> list = param.getList();
 						batch.add(Tuple.tuple(list));
 					}
-					connection.preparedBatch(qp.getSql(), batch, res -> {
+					connection.preparedQuery(qp.getSql()).executeBatch(batch, res -> {
 						if (res.succeeded()) {
+							result.complete(new ArrayList<>());
 							connection.close();
 						} else {
-							handler.handle(Future.failedFuture(res.cause()));
+							result.fail(res.cause());
 							connection.close();
 						}
 					});
 				} else {
-					handler.handle(Future.failedFuture(conn.cause()));
+					result.fail(conn.cause());
 				}
 			});
 		} else {
-			handler.handle(Future.failedFuture(qp.getSql()));
+			return Future.failedFuture(qp.getSql());
 		}
+		return result.future();
 	}
+
 	/**
 	 * 执行查询
-	 * 
+	 *
 	 * @param qp
 	 * @param handler
 	 */
-	public void queryExecute(SqlAndParams qp, Handler<AsyncResult<RowSet<Row>>> handler) {
+	public Future<RowSet<Row>> queryExecute(SqlAndParams qp) {
+		Promise<RowSet<Row>> promise = Promise.promise();
 		if (qp.succeeded()) {
 			if (qp.getParams() == null) {
-				client.query(qp.getSql(), handler);
+				client.query(qp.getSql()).execute(promise);
 			} else {
 				@SuppressWarnings("unchecked")
 				List<Object> list = qp.getParams().getList();
-				client.preparedQuery(qp.getSql(), Tuple.tuple(list), handler);
+				client.preparedQuery(qp.getSql()).execute(Tuple.tuple(list), promise);
 			}
 		} else {
-			handler.handle(Future.failedFuture(qp.getSql()));
+			promise.fail(qp.getSql());
 		}
+		return promise.future();
 	}
+
 	/**
 	 * 执行更新
-	 * 
+	 *
 	 * @param qp
 	 * @param handler
 	 */
-	public void updateExecute(SqlAndParams qp, Handler<AsyncResult<RowSet<Row>>> handler) {
+	public Future<RowSet<Row>> updateExecute(SqlAndParams qp) {
+		Promise<RowSet<Row>> result = Promise.promise();
 		if (qp.succeeded()) {
 			if (qp.getParams() == null) {
-				client.query(qp.getSql(), handler);
+				client.query(qp.getSql()).execute(result);
 			} else {
 				@SuppressWarnings("unchecked")
 				List<Object> list = qp.getParams().getList();
-				client.preparedQuery(qp.getSql(), Tuple.tuple(list), handler);
+				client.preparedQuery(qp.getSql()).execute(Tuple.tuple(list), result);
 			}
 		} else {
-			handler.handle(Future.failedFuture(qp.getSql()));
+			result.fail(qp.getSql());
 		}
+		return result.future();
 	}
 
 }

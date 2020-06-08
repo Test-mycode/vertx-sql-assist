@@ -50,9 +50,9 @@ public class SqlLimitResult<T> {
 	/** 数据总页数 */
 	private int pages;
 	/** 当前是第几页 */
-	private int page;
+	private final int page;
 	/** 每页显示多少行数据 */
-	private int size;
+	private final int size;
 	/** 数据 */
 	private List<T> data;
 

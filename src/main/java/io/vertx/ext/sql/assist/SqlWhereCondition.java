@@ -36,8 +36,8 @@ public class SqlWhereCondition<T> {
 		}
 		if (values != null) {
 			JsonArray array = new JsonArray();
-			for (int i = 0; i < values.length; i++) {
-				array.add(values[i]);
+			for (Object o : values) {
+				array.add(o);
 			}
 			json.put("values", array);
 		}
@@ -60,9 +60,7 @@ public class SqlWhereCondition<T> {
 		}
 		if (obj.getValue("values") instanceof JsonArray) {
 			List<Object> list = new ArrayList<>();
-			obj.getJsonArray("values").forEach(va -> {
-				list.add(va);
-			});
+			obj.getJsonArray("values").forEach(list::add);
 			condition.setValues(list.toArray());
 		}
 		return condition;
@@ -110,6 +108,89 @@ public class SqlWhereCondition<T> {
 	 */
 	public static <T> SqlWhereCondition<T> orEq(String column, T value) {
 		return new SqlWhereCondition<T>("or " + column + " = ? ", value);
+	}
+
+
+	/**
+	 * SQL: [and] column = value <br>
+	 * 注释: 并且列名=条件值
+	 *
+	 * @param column
+	 *          列名,如果存在相同列名则使用表名.列名
+	 * @param value
+	 *          条件值
+	 * @return
+	 */
+	public static <T> SqlWhereCondition<T> andIn(String column, T... value) {
+		if(value.length==0)
+			return new SqlWhereCondition<>("and false ");
+		StringBuilder in = new StringBuilder("?");
+		for(int i=1;i<value.length;i++) {
+			in.append(",").append("?");
+		}
+		return new SqlWhereCondition<T>("and " + column + " in ("+in+") ", value);
+	}
+
+	/**
+	 * SQL: [or] column = value<br>
+	 * 注释: 或者列名=条件值
+	 *
+	 * @param column
+	 *          列名,如果存在相同列名则使用表名.列名
+	 * @param value
+	 *          条件值
+	 * @return
+	 */
+	public static <T> SqlWhereCondition<T> orIn(String column, T... value) {
+		if(value.length==0)
+			return new SqlWhereCondition<>("or false ");
+		StringBuilder in = new StringBuilder("?");
+		for(int i=1;i<value.length;i++) {
+			in.append(",").append("?");
+		}
+		return new SqlWhereCondition<T>("or " + column + " in ("+in+") ", value);
+	}
+
+
+
+	/**
+	 * SQL: [and] column = value <br>
+	 * 注释: 并且列名=条件值
+	 *
+	 * @param column
+	 *          列名,如果存在相同列名则使用表名.列名
+	 * @param value
+	 *          条件值
+	 * @return
+	 */
+	public static <T> SqlWhereCondition<T> andNotIn(String column, T... value) {
+		if(value.length==0)
+			return new SqlWhereCondition<>("and true ");
+		StringBuilder in = new StringBuilder("?");
+		for(int i=1;i<value.length;i++) {
+			in.append(",").append("?");
+		}
+		return new SqlWhereCondition<T>("and " + column + " not in ("+in+") ", value);
+	}
+
+	/**
+	 * SQL: [or] column = value<br>
+	 * 注释: 或者列名=条件值
+	 *
+	 * @param column
+	 *          列名,如果存在相同列名则使用表名.列名
+	 * @param value
+	 *          条件值
+	 * @return
+	 */
+	public static <T> SqlWhereCondition<T> orNotIn(String column, T... value) {
+		if(value.length==0)
+			return new SqlWhereCondition<>("or true ");
+		StringBuilder in = new StringBuilder("?");
+		for(int i=1;i<value.length;i++) {
+			in.append(",").append("?");
+		}
+		return new SqlWhereCondition<T>("or " + column + " not in ("+in+") ", value);
 	}
 
 	/**
@@ -272,7 +353,7 @@ public class SqlWhereCondition<T> {
 	 * 
 	 * @param column
 	 *          列名,如果存在相同列名则使用表名.列名
-	 * @param value
+	 * @param req
 	 *          条件值,通配符需要自己添加
 	 * @return
 	 */
@@ -300,7 +381,7 @@ public class SqlWhereCondition<T> {
 	 * 
 	 * @param column
 	 *          列名,如果存在相同列名则使用表名.列名
-	 * @param value
+	 * @param req
 	 *          条件值,通配符需要自己添加
 	 * @return
 	 */

@@ -316,6 +316,72 @@ public class SqlAssist {
 		return this;
 	}
 
+
+	/**
+	 * 添加并且属于条件<br>
+	 * 示例: column = id ,value =1<br>
+	 * SQL: [and] id in (1)
+	 *
+	 * @param column
+	 *          列名:如果表中存在相同列名使用表名.列名
+	 * @param value
+	 *          条件值
+	 * @return
+	 */
+	public <T> SqlAssist andIn(String column, T... value) {
+		this.setConditions(SqlWhereCondition.andIn(column, value));
+		return this;
+	}
+
+	/**
+	 * 添加或者属于条件<br>
+	 * 示例: column = id ,value =1<br>
+	 * SQL: [or] id in (1)
+	 *
+	 * @param column
+	 *          列名:如果表中存在相同列名使用表名.列名
+	 * @param value
+	 *          条件值
+	 * @return
+	 */
+	public <T> SqlAssist orIn(String column, T... value) {
+		this.setConditions(SqlWhereCondition.orIn(column, value));
+		return this;
+	}
+
+
+	/**
+	 * 添加并且不属于条件<br>
+	 * 示例: column = id ,value =1<br>
+	 * SQL: [and] id not in ( 1 )
+	 *
+	 * @param column
+	 *          列名:如果表中存在相同列名使用表名.列名
+	 * @param value
+	 *          条件值
+	 * @return
+	 */
+	public <T> SqlAssist andNotIn(String column, T... value) {
+		this.setConditions(SqlWhereCondition.andNotIn(column, value));
+		return this;
+	}
+
+	/**
+	 * 添加或者不属于条件<br>
+	 * 示例: column = id ,value =1<br>
+	 * SQL: [or] id not in (1)
+	 *
+	 * @param column
+	 *          列名:如果表中存在相同列名使用表名.列名
+	 * @param value
+	 *          条件值
+	 * @return
+	 */
+	public <T> SqlAssist orNotIn(String column, T... value) {
+		this.setConditions(SqlWhereCondition.orNotIn(column, value));
+		return this;
+	}
+
 	/**
 	 * 添加并且不等于条件<br>
 	 * 示例: column = id ,value =1<br>

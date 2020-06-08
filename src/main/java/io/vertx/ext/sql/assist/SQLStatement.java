@@ -24,6 +24,14 @@ public interface SQLStatement {
 	static void register(Class<?> statementImplClass) {
 		System.setProperty(PROVIDER_CLASS_KEY, statementImplClass.getName());
 	}
+
+	/**
+	 * 获取SQL语句使用哪个类实现
+	 */
+	static String getStatementClassName() {
+		return System.getProperty(PROVIDER_CLASS_KEY);
+	}
+
 	/**
 	 * 设置SQL语句使用哪个类实现
 	 * 
@@ -116,13 +124,41 @@ public interface SQLStatement {
 	 * 
 	 */
 	<T> SqlAndParams selectByObjSQL(T obj, String resultColumns, String joinOrReference, boolean single);
+
+
 	/**
 	 * 插入一个对象包括属性值为null的值<br>
-	 * 
+	 *
 	 * @param obj
 	 * @return 返回:sql 或者 sql与params
 	 */
 	<T> SqlAndParams insertAllSQL(T obj);
+
+	/**
+	 * 插入一个对象包括属性值为null的值<br>
+	 *
+	 * @param obj
+	 * @return 返回:sql 或者 sql与params
+	 */
+	<T> SqlAndParams upsertAllSQL(T obj);
+
+	/**
+	 * 插入一个对象包括属性值为null的值<br>
+	 *
+	 * @param obj
+	 * @return 返回:sql 或者 sql与params
+	 */
+	<T> SqlAndParams insertAllSQLReturnId(T obj);
+
+
+	/**
+	 * 插入一个对象包括属性值为null的值<br>
+	 *
+	 * @param obj
+	 * @return 返回:sql 或者 sql与params
+	 */
+	<T> SqlAndParams upsertAllSQLReturnId(T obj);
+
 
 	/**
 	 * 插入一个对象,只插入对象中值不为null的属性<br>
@@ -132,6 +168,38 @@ public interface SQLStatement {
 	 * @return 返回:sql 或 sql与params
 	 */
 	<T> SqlAndParams insertNonEmptySQL(T obj);
+
+
+	/**
+	 * 插入一个对象,只插入对象中值不为null的属性<br>
+	 *
+	 * @param obj
+	 *          对象
+	 * @return 返回:sql 或 sql与params
+	 */
+	<T> SqlAndParams upsertNonEmptySQL(T obj);
+
+
+	/**
+	 * 插入一个对象,只插入对象中值不为null的属性<br>
+	 *
+	 * @param obj
+	 *          对象
+	 * @return 返回:sql 或 sql与params
+	 */
+	<T> SqlAndParams insertNonEmptySQLReturnId(T obj);
+
+
+
+	/**
+	 * 插入一个对象,只插入对象中值不为null的属性<br>
+	 *
+	 * @param obj
+	 *          对象
+	 * @return 返回:sql 或 sql与params
+	 */
+	<T> SqlAndParams upsertNonEmptySQLReturnId(T obj);
+
 	/**
 	 * 批量添加全部所有字段
 	 * 
@@ -142,7 +210,7 @@ public interface SQLStatement {
 	/**
 	 * 批量添加自定字段
 	 * 
-	 * @param column
+	 * @param columns
 	 *          字段的名称示例:["id","name",...]
 	 * @param params
 	 *          字段对应的参数示例:[["id","name"],["id","name"]...]

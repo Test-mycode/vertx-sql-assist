@@ -2,11 +2,11 @@ package io.vertx.ext.sql.assist;
 
 import java.util.List;
 
-import io.vertx.core.AsyncResult;
-import io.vertx.core.Handler;
+import io.vertx.core.Future;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
-import io.vertx.ext.jdbc.JDBCClient;
+import io.vertx.core.logging.Logger;
+import io.vertx.ext.sql.SQLClient;
 import io.vertx.mysqlclient.MySQLPool;
 import io.vertx.pgclient.PgPool;
 
@@ -18,32 +18,20 @@ import io.vertx.pgclient.PgPool;
  */
 public interface SQLExecute<T> {
 	/**
-	 * 通过JDBC客户端创建一个实例
+	 * 通过SQL客户端创建一个实例
 	 * 
 	 * @param client
 	 * @return
 	 */
-	static SQLExecute<JDBCClient> createJDBC(JDBCClient client) {
-		return new SQLExecuteJDBCImpl(client);
+	static SQLExecute<SQLClient> create(SQLClient client) {
+		return new SQLExecuteImpl(client);
 	}
 
-	/**
-	 * 通过 MySQL客户端创建一个实例
-	 * 
-	 * @param client
-	 * @return
-	 */
-	static SQLExecute<MySQLPool> createMySQL(MySQLPool client) {
+	static SQLExecute<MySQLPool> createMySql(MySQLPool client) {
 		return new SQLExecuteMySQLImpl(client);
 	}
 
-	/**
-	 * 通过 PostgreSQL客户端创建一个实例
-	 * 
-	 * @param client
-	 * @return
-	 */
-	static SQLExecute<PgPool> createPostgreSQL(PgPool client) {
+	static SQLExecute<PgPool> createPg(PgPool client) {
 		return new SQLExecutePgImpl(client);
 	}
 
@@ -54,35 +42,51 @@ public interface SQLExecute<T> {
 	 */
 	T getClient();
 
-	/**
-	 * 执行查询
-	 * 
-	 * @param qp
-	 *          SQL语句与参数
-	 * @param handler
-	 *          返回结果
-	 */
-	void queryAsObj(SqlAndParams qp, Handler<AsyncResult<JsonObject>> handler);
+	/*
+	*  添加日志
+	*
+	* */
+	void setLogger(Logger logger);
 
 	/**
 	 * 执行查询
 	 * 
 	 * @param qp
 	 *          SQL语句与参数
-	 * @param handler
+	 * @return future
 	 *          返回结果
 	 */
-	void queryAsListObj(SqlAndParams qp, Handler<AsyncResult<List<JsonObject>>> handler);
+	Future<JsonObject> queryAsObj(SqlAndParams qp);
 
 	/**
 	 * 执行查询
 	 * 
 	 * @param qp
 	 *          SQL语句与参数
-	 * @param handler
+	 * @return future
 	 *          返回结果
 	 */
-	void queryAsListArray(SqlAndParams qp, Handler<AsyncResult<List<JsonArray>>> handler);
+	Future<List<JsonObject>> queryAsListObj(SqlAndParams qp);
+
+	/**
+	 * 执行查询
+	 * 
+	 * @param qp
+	 *          SQL语句与参数
+	 * @return future
+	 *          返回结果
+	 */
+	Future<List<JsonArray>> queryAsListArray(SqlAndParams qp);
+
+	/**
+	 * 执行更新等操作得到受影响的行数
+	 *
+	 * @param qp
+	 *          SQL语句与参数
+	 *
+	 * @return future
+	 */
+	Future<JsonArray> insert(SqlAndParams qp);
 
 	/**
 	 * 执行更新等操作得到受影响的行数
@@ -90,9 +94,9 @@ public interface SQLExecute<T> {
 	 * @param qp
 	 *          SQL语句与参数
 	 * 
-	 * @param handler
+	 * @return future
 	 */
-	void update(SqlAndParams qp, Handler<AsyncResult<Integer>> handler);
+	Future<Integer> update(SqlAndParams qp);
 
 	/**
 	 * 批量操作
@@ -100,8 +104,9 @@ public interface SQLExecute<T> {
 	 * @param qp
 	 *          SQL语句与批量参数
 	 * 
-	 * @param handler
+	 * @return future
 	 *          返回结果
 	 */
-	void batch(SqlAndParams qp, Handler<AsyncResult<List<Integer>>> handler);
+	Future<List<Integer>> batch(SqlAndParams qp);
+
 }

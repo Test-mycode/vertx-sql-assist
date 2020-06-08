@@ -23,7 +23,7 @@ public class SqlServerStatementSQL extends AbstractStatementSQL {
 	}
 
 	/** 日志工具 */
-	private final Logger LOG = LoggerFactory.getLogger(SqlServerStatementSQL.class);
+	private static final Logger LOG = LoggerFactory.getLogger(SqlServerStatementSQL.class);
 	/**
 	 * 分页的排序,子类可以重写该方法
 	 * 
@@ -147,6 +147,41 @@ public class SqlServerStatementSQL extends AbstractStatementSQL {
 			LOG.debug("selectByObjSQL : " + result.toString());
 		}
 		return result;
+	}
+
+	@Override
+	public <T> SqlAndParams upsertAllSQL(T obj) {
+		throw new UnsupportedOperationException("未实现");
+	}
+
+	@Override
+	public <T> SqlAndParams insertAllSQLReturnId(T obj) {
+		throw new UnsupportedOperationException("未实现");
+	}
+
+	@Override
+	public <T> SqlAndParams upsertAllSQLReturnId(T obj) {
+		throw new UnsupportedOperationException("未实现");
+	}
+
+	@Override
+	public <T> SqlAndParams upsertNonEmptySQL(T obj) {
+		throw new UnsupportedOperationException("未实现");
+	}
+
+	@Override
+	public <T> SqlAndParams insertNonEmptySQLReturnId(T obj) {
+		throw new UnsupportedOperationException("未实现");
+	}
+
+	@Override
+	public <T> SqlAndParams upsertNonEmptySQLReturnId(T obj) {
+		throw new UnsupportedOperationException("未实现");
+	}
+
+	@Override
+	protected Logger getLOG() {
+		throw new UnsupportedOperationException("未实现");
 	}
 
 }

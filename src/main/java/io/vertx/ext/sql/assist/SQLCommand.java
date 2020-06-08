@@ -2,9 +2,7 @@ package io.vertx.ext.sql.assist;
 
 import java.util.List;
 
-import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
-import io.vertx.core.Handler;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 
@@ -18,53 +16,52 @@ public interface SQLCommand {
 	/**
 	 * 获得数据总行数
 	 * 
-	 * @param handler
+	 * @return future
 	 *          返回数据总行数
 	 */
-	default void getCount(Handler<AsyncResult<Long>> handler) {
-		getCount(null, handler);
+	default Future<Long> getCount() {
+		return getCount(null);
 	}
 	/**
 	 * 获取数据总行数
 	 * 
 	 * @param assist
 	 *          查询工具,如果没有可以为null
-	 * @param handler
+	 * @return future
 	 *          返回数据总行数
 	 */
-	void getCount(SqlAssist assist, Handler<AsyncResult<Long>> handler);
+	Future<Long> getCount(SqlAssist assist);
 
 	/**
 	 * 查询所有数据
 	 * 
-	 * @param handler
+	 * @return future
 	 *          结果集
 	 */
-	default void selectAll(Handler<AsyncResult<List<JsonObject>>> handler) {
-		selectAll(null, handler);
+	default Future<List<JsonObject>> selectAll() {
+		return selectAll(null);
 	}
 	/**
 	 * 通过查询工具查询所有数据
 	 * 
 	 * @param assist
 	 *          查询工具帮助类
-	 * @param handler
+	 * @return future
 	 *          结果集
 	 */
-	void selectAll(SqlAssist assist, Handler<AsyncResult<List<JsonObject>>> handler);
+	Future<List<JsonObject>> selectAll(SqlAssist assist);
 
 	/**
 	 * 分页查询,默认page=1,rowSize=15(取第一页,每页取15行数据)
 	 * 
 	 * @param assist
 	 *          查询工具(注意:startRow在该方法中无效,最后会有page转换为startRow)
-	 * @param handler
+	 * @return future
 	 *          返回结果为(JsonObject)格式为: {@link SqlLimitResult#toJson()}
 	 */
-	default void limitAll(final SqlAssist assist, Handler<AsyncResult<JsonObject>> handler) {
+	default Future<JsonObject> limitAll(final SqlAssist assist) {
 		if (assist == null) {
-			handler.handle(Future.failedFuture("The SqlAssist cannot be null , you can pass in new SqlAssist()"));
-			return;
+			return Future.failedFuture("The SqlAssist cannot be null , you can pass in new SqlAssist()");
 		}
 		if (assist.getPage() == null || assist.getPage() < 1) {
 			assist.setPage(1);
@@ -77,26 +74,17 @@ public interface SQLCommand {
 		} else {
 			assist.setStartRow((assist.getPage() - 1) * assist.getRowSize());
 		}
-		getCount(assist, cres -> {
-			if (cres.succeeded()) {
-				Long count = cres.result();
-				SqlLimitResult<JsonObject> result = new SqlLimitResult<>(count, assist.getPage(), assist.getRowSize());
-				if (count == 0 || assist.getPage() > result.getPages()) {
-					handler.handle(Future.succeededFuture(result.toJson()));
-				} else {
-					selectAll(assist, dres -> {
-						if (dres.succeeded()) {
-							result.setData(dres.result());
-							handler.handle(Future.succeededFuture(result.toJson()));
-						} else {
-							handler.handle(Future.failedFuture(dres.cause()));
-						}
-					});
-				}
-			} else {
-				handler.handle(Future.failedFuture(cres.cause()));
-			}
-		});
+		return this.getCount(assist)
+				.compose(count -> {
+					SqlLimitResult<JsonObject> result = new SqlLimitResult<>(count, assist.getPage(), assist.getRowSize());
+					if (count == 0 || assist.getPage() > result.getPages()) {
+						return Future.succeededFuture(result.toJson());
+					} else {
+						return this.selectAll(assist)
+								.map(result::setData)
+								.map(SqlLimitResult::toJson);
+					}
+				});
 	};
 
 	/**
@@ -104,11 +92,11 @@ public interface SQLCommand {
 	 * 
 	 * @param primaryValue
 	 *          主键值
-	 * @param handler
+	 * @return future
 	 *          返回结果:如果查询得到返回JsonObject如果查询不到返回null
 	 */
-	default <S> void selectById(S primaryValue, Handler<AsyncResult<JsonObject>> handler) {
-		selectById(primaryValue, null, null, handler);
+	default <S> Future<JsonObject> selectById(S primaryValue) {
+		return selectById(primaryValue, null, null);
 	}
 
 	/**
@@ -118,11 +106,11 @@ public interface SQLCommand {
 	 *          主键值
 	 * @param resultColumns
 	 *          自定义返回列
-	 * @param handler
+	 * @return future
 	 *          返回结果:如果查询得到返回JsonObject如果查询不到返回null
 	 */
-	default <S> void selectById(S primaryValue, String resultColumns, Handler<AsyncResult<JsonObject>> handler) {
-		selectById(primaryValue, resultColumns, null, handler);
+	default <S> Future<JsonObject> selectById(S primaryValue, String resultColumns) {
+		return selectById(primaryValue, resultColumns, null);
 	}
 
 	/**
@@ -134,21 +122,19 @@ public interface SQLCommand {
 	 *          自定义返回列
 	 * @param joinOrReference
 	 *          多表查询或表连接的语句,示例 as t inner join table2 as t2 on t.id=t2.id
-	 * @param handler
-	 *          返回结果:如果查询得到返回JsonObject如果查询不到返回null
 	 */
-	<S> void selectById(S primaryValue, String resultColumns, String joinOrReference, Handler<AsyncResult<JsonObject>> handler);
+	<S> Future<JsonObject> selectById(S primaryValue, String resultColumns, String joinOrReference);
 	/**
 	 * 将对象属性不为null的属性作为条件查询出数据,只取查询出来的第一条数据;
 	 * 
 	 * @param obj
 	 *          对象
 	 * 
-	 * @param handler
+	 * @return future
 	 *          结果:如果存在返回JsonObject,不存在返回null
 	 */
-	default <T> void selectSingleByObj(T obj, Handler<AsyncResult<JsonObject>> handler) {
-		selectSingleByObj(obj, null, null, handler);
+	default <T> Future<JsonObject> selectSingleByObj(T obj) {
+		return selectSingleByObj(obj, null, null);
 	}
 	/**
 	 * 将对象属性不为null的属性作为条件查询出数据,只取查询出来的第一条数据
@@ -158,11 +144,11 @@ public interface SQLCommand {
 	 * @param resultColumns
 	 *          自定义返回列
 	 * 
-	 * @param handler
+	 * @return future
 	 *          结果:如果存在返回JsonObject,不存在返回null
 	 */
-	default <T> void selectSingleByObj(T obj, String resultColumns, Handler<AsyncResult<JsonObject>> handler) {
-		selectSingleByObj(obj, resultColumns, null, handler);
+	default <T> Future<JsonObject> selectSingleByObj(T obj, String resultColumns) {
+		return selectSingleByObj(obj, resultColumns, null);
 	}
 	/**
 	 * 将对象属性不为null的属性作为条件查询出数据,只取查询出来的第一条数据
@@ -173,21 +159,21 @@ public interface SQLCommand {
 	 *          自定义返回列
 	 * @param joinOrReference
 	 *          多表查询或表连接的语句,示例 as t inner join table2 as t2 on t.id=t2.id
-	 * @param handler
+	 * @return future
 	 *          结果:如果存在返回JsonObject,不存在返回null
 	 */
-	<T> void selectSingleByObj(T obj, String resultColumns, String joinOrReference, Handler<AsyncResult<JsonObject>> handler);
+	<T> Future<JsonObject> selectSingleByObj(T obj, String resultColumns, String joinOrReference);
 	/**
 	 * 将对象属性不为null的属性作为条件查询出数据
 	 * 
 	 * @param obj
 	 *          对象
 	 * 
-	 * @param handler
+	 * @return future
 	 *          返回结果集
 	 */
-	default <T> void selectByObj(T obj, Handler<AsyncResult<List<JsonObject>>> handler) {
-		selectByObj(obj, null, null, handler);
+	default <T> Future<List<JsonObject>> selectByObj(T obj) {
+		return selectByObj(obj, null, null);
 	}
 	/**
 	 * 将对象属性不为null的属性作为条件查询出数据
@@ -197,11 +183,11 @@ public interface SQLCommand {
 	 * @param resultColumns
 	 *          自定义返回列
 	 * 
-	 * @param handler
+	 * @return future
 	 *          返回结果集
 	 */
-	default <T> void selectByObj(T obj, String resultColumns, Handler<AsyncResult<List<JsonObject>>> handler) {
-		selectByObj(obj, resultColumns, null, handler);
+	default <T> Future<List<JsonObject>> selectByObj(T obj, String resultColumns) {
+		return selectByObj(obj, resultColumns, null);
 	}
 	/**
 	 * 将对象属性不为null的属性作为条件查询出数据
@@ -212,50 +198,118 @@ public interface SQLCommand {
 	 *          自定义返回列
 	 * @param joinOrReference
 	 *          多表查询或表连接的语句,示例 as t inner join table2 as t2 on t.id=t2.id
-	 * @param handler
+	 * @return future
 	 *          返回结果集
 	 */
-	<T> void selectByObj(T obj, String resultColumns, String joinOrReference, Handler<AsyncResult<List<JsonObject>>> handler);
+	<T> Future<List<JsonObject>> selectByObj(T obj, String resultColumns, String joinOrReference);
 
 	/**
 	 * 插入一个对象包括属性值为null的值
 	 * 
 	 * @param obj
 	 *          对象
-	 * @param handler
+	 * @return future
 	 *          返回操作结果
 	 */
-	<T> void insertAll(T obj, Handler<AsyncResult<Integer>> handler);
+	<T> Future<Integer> insertAll(T obj);
+
+
+	/**
+	 * 插入一个对象包括属性值为null的值
+	 *
+	 * @param obj
+	 *          对象
+	 * @return future
+	 *          返回操作结果
+	 */
+	<T> Future<Integer> upsertAll(T obj);
+
+
+	/**
+	 * 插入一个对象包括属性值为null的值并返回id
+	 *
+	 * @param obj
+	 *          对象
+	 * @return future
+	 *          返回操作结果
+	 */
+	<T> Future<JsonArray> insertAllReturnId(T obj);
+
+
+	/**
+	 * 插入一个对象包括属性值为null的值并返回id
+	 *
+	 * @param obj
+	 *          对象
+	 * @return future
+	 *          返回操作结果
+	 */
+	<T> Future<JsonArray> upsertAllReturnId(T obj);
 
 	/**
 	 * 插入一个对象,只插入对象中值不为null的属性
 	 * 
 	 * @param obj
 	 *          对象
-	 * @param handler
+	 * @return future
 	 *          返回操作结果
 	 */
-	<T> void insertNonEmpty(T obj, Handler<AsyncResult<Integer>> handler);
+	<T> Future<Integer> insertNonEmpty(T obj);
+
+
+
+	/**
+	 * 插入一个对象,只插入对象中值不为null的属性
+	 *
+	 * @param obj
+	 *          对象
+	 * @return future
+	 *          返回操作结果
+	 */
+	<T> Future<Integer> upsertNonEmpty(T obj);
+
+
+	/**
+	 * 插入一个对象,只插入对象中值不为null的属性
+	 *
+	 * @param obj
+	 *          对象
+	 * @return future
+	 *          返回操作结果
+	 */
+	<T> Future<JsonArray> insertNonEmptyReturnId(T obj);
+
+
+	/**
+	 * 插入一个对象,只插入对象中值不为null的属性
+	 *
+	 * @param obj
+	 *          对象
+	 * @return future
+	 *          返回操作结果
+	 */
+	<T> Future<JsonArray> upsertNonEmptyReturnId(T obj);
+
 	/**
 	 * 批量添加全部所有字段
 	 * 
 	 * @param list
 	 *          对象
-	 * @param handler
+	 * @return future
 	 *          成功返回受影响的行数,如果对象为null或空则返回0
 	 */
-	<T> void insertBatch(List<T> list, Handler<AsyncResult<Long>> handler);
+	<T> Future<Long> insertBatch(List<T> list);
 	/**
 	 * 批量添加自定字段
 	 * 
-	 * @param column
+	 * @param columns
 	 *          字段的名称示例:["id","name",...]
 	 * @param params
 	 *          字段对应的参数示例:[["id","name"],["id","name"]...]
-	 * @param handler
+	 * @return future
 	 *          成功返回受影响的行数,如果字段或字段参数为null或空则返回0
 	 */
-	void insertBatch(List<String> columns, List<JsonArray> params, Handler<AsyncResult<Long>> handler);
+	Future<Long> insertBatch(List<String> columns, List<JsonArray> params);
 
 	/**
 	 * 插入一个对象,如果该对象不存在就新建如果该对象已经存在就更新
@@ -263,10 +317,10 @@ public interface SQLCommand {
 	 * @param obj
 	 *          对象
 	 * 
-	 * @param handler
+	 * @return future
 	 *          结果集受影响的行数
 	 */
-	<T> void replace(T obj, Handler<AsyncResult<Integer>> handler);
+	<T> Future<Integer> replace(T obj);
 
 	/**
 	 * 更新一个对象中所有的属性包括null值,条件为对象中的主键值
@@ -274,32 +328,32 @@ public interface SQLCommand {
 	 * @param obj
 	 *          对象
 	 * 
-	 * @param handler
+	 * @return future
 	 *          返回操作结果
 	 */
-	<T> void updateAllById(T obj, Handler<AsyncResult<Integer>> handler);
+	<T> Future<Integer> updateAllById(T obj);
 
 	/**
 	 * 更新一个对象中所有的属性包括null值,条件为SqlAssist条件集<br>
 	 * 
 	 * @param obj
 	 *          对象
-	 * @param SqlAssist
+	 * @param assist
 	 *          sql帮助工具
 	 * 
-	 * @param handler
+	 * @return future
 	 *          返回操作结果
 	 */
-	<T> void updateAllByAssist(T obj, SqlAssist assist, Handler<AsyncResult<Integer>> handler);
+	<T> Future<Integer> updateAllByAssist(T obj, SqlAssist assist);
 	/**
 	 * 更新一个对象中属性不为null值,条件为对象中的主键值
 	 * 
 	 * @param obj
 	 *          对象
-	 * @param handler
+	 * @return future
 	 *          返回操作结果
 	 */
-	<T> void updateNonEmptyById(T obj, Handler<AsyncResult<Integer>> handler);
+	<T> Future<Integer> updateNonEmptyById(T obj);
 
 	/**
 	 * 更新一个对象中属性不为null值,条件为SqlAssist条件集
@@ -308,10 +362,10 @@ public interface SQLCommand {
 	 *          对象
 	 * @param assist
 	 *          查询工具
-	 * @param handler
+	 * @return future
 	 *          返回操作结果
 	 */
-	<T> void updateNonEmptyByAssist(T obj, SqlAssist assist, Handler<AsyncResult<Integer>> handler);
+	<T> Future<Integer> updateNonEmptyByAssist(T obj, SqlAssist assist);
 
 	/**
 	 * 通过主键值设置指定的列为空
@@ -322,10 +376,10 @@ public interface SQLCommand {
 	 * @param columns
 	 *          要设置为null的列
 	 * 
-	 * @param handler
+	 * @return future
 	 *          返回操作结果
 	 */
-	<S> void updateSetNullById(S primaryValue, List<String> columns, Handler<AsyncResult<Integer>> handler);
+	<S> Future<Integer> updateSetNullById(S primaryValue, List<String> columns);
 
 	/**
 	 * 通过Assist作为条件设置指定的列为空
@@ -335,31 +389,29 @@ public interface SQLCommand {
 	 * @param columns
 	 *          要设置为null的列
 	 * 
-	 * @param handler
+	 * @return future
 	 *          返回操作结果
-	 * @param nullable
-	 *          没有实际作用,用于做方法重载而已,可以传入null
 	 */
-	<T> void updateSetNullByAssist(SqlAssist assist, List<String> columns, Handler<AsyncResult<Integer>> handler);
+	<T> Future<Integer> updateSetNullByAssist(SqlAssist assist, List<String> columns);
 
 	/**
 	 * 通过主键值删除对应的数据行
 	 * 
-	 * @param obj
+	 * @param primaryValue
 	 *          主键值
-	 * @param handler
+	 * @return future
 	 *          返回操作结果
 	 */
-	<S> void deleteById(S primaryValue, Handler<AsyncResult<Integer>> handler);
+	<S> Future<Integer> deleteById(S primaryValue);
 	/**
 	 * 通过SqlAssist条件集删除对应的数据行
 	 * 
 	 * @param assist
 	 *          条件集
 	 * 
-	 * @param handler
+	 * @return future
 	 *          返回操作结果
 	 */
-	void deleteByAssist(SqlAssist assist, Handler<AsyncResult<Integer>> handler);
+	Future<Integer> deleteByAssist(SqlAssist assist);
 
 }

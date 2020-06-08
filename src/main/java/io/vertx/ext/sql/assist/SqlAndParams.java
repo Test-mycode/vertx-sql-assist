@@ -189,7 +189,7 @@ public class SqlAndParams {
 	 * 用于将SqlAndParams添加中的sql与params添加到当前对象的Batch中,既将多个普通SqlAndParams填充成一个Batch
 	 * SqlAndParams
 	 * 
-	 * @param sqlAndParams
+	 * @param sqlp
 	 * @return
 	 */
 	public SqlAndParams addSqlAndParams(SqlAndParams... sqlp) {

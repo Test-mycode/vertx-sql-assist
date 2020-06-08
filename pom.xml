@@ -5,7 +5,7 @@
 
 	<groupId>org.mirrentools</groupId>
 	<artifactId>vertx-sql-assist</artifactId>
-	<version>1.0.9</version>
+	<version>1.1.0</version>
 	<packaging>jar</packaging>
 	<name>vertx-sql-assist</name>
 	<description>vertx-sql-assist is the SQL operation help tool of Vert.x, which provides the support of insert, delete, update, query, join, paging query, cooperate with SqlAssist help class, it basically does not need to write a line of SQL code.</description>
@@ -13,7 +13,7 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<vertx.version>3.8.5</vertx.version>
+		<vertx.version>3.9.1</vertx.version>
 	</properties>
 
 	<dependencies>
@@ -58,6 +58,12 @@
 			<artifactId>mysql-connector-java</artifactId>
 			<version>8.0.11</version>
 			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>io.vertx</groupId>
+			<artifactId>vertx-mysql-postgresql-client-jasync</artifactId>
+			<version>${vertx.version}</version>
+			<scope>provided</scope>
 		</dependency>
 	</dependencies>
 	<build>
