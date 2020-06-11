@@ -22,6 +22,31 @@ public class MySQLStatementSQL extends AbstractStatementSQL {
 	}
 
 	@Override
+	protected String getSqlTableColumnsAlias(String alias) {
+		return "`"+alias+"`";
+	}
+
+	@Override
+	protected String getSqlTableColumns(String value) {
+		return "`"+value+"`";
+	}
+
+	@Override
+	protected String getSqlPrimaryIdAlias(String value) {
+		return "`"+value+"`";
+	}
+
+	@Override
+	protected String getSqlPrimaryId(String value) {
+		return "`"+value+"`";
+	}
+
+	@Override
+	protected String getSqlTableName(String value) {
+		return "`"+value+"`";
+	}
+
+	@Override
 	protected Logger getLOG() {
 		return LOG;
 	}
