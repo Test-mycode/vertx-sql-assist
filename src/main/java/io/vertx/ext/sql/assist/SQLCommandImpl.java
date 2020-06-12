@@ -15,11 +15,11 @@ public class SQLCommandImpl implements SQLCommand {
     /**
      * 语句
      */
-    private SQLStatement statement;
+    private final SQLStatement statement;
     /**
      * 执行器
      */
-    private SQLExecute<?> execute;
+    private final SQLExecute<?> execute;
 
     /**
      * 初始化
@@ -88,18 +88,6 @@ public class SQLCommandImpl implements SQLCommand {
 	}
 
 	@Override
-    public <T> Future<JsonArray> insertAllReturnId(T obj) {
-        SqlAndParams qp = statement.insertAllSQLReturnId(obj);
-        return execute.insert(qp);
-    }
-
-	@Override
-	public <T> Future<JsonArray> upsertAllReturnId(T obj) {
-		SqlAndParams qp = statement.upsertAllSQLReturnId(obj);
-		return execute.insert(qp);
-	}
-
-	@Override
     public <T> Future<Integer> insertNonEmpty(T obj) {
         SqlAndParams qp = statement.insertNonEmptySQL(obj);
         return execute.update(qp);
@@ -115,34 +103,6 @@ public class SQLCommandImpl implements SQLCommand {
     public <T> Future<JsonArray> insertNonEmptyReturnId(T obj) {
         SqlAndParams qp = statement.insertNonEmptySQLReturnId(obj);
         return execute.insert(qp);
-    }
-
-	@Override
-	public <T> Future<JsonArray> upsertNonEmptyReturnId(T obj) {
-		SqlAndParams qp = statement.upsertNonEmptySQLReturnId(obj);
-		return execute.insert(qp);
-	}
-
-
-	@Override
-    public <T> Future<Long> insertBatch(List<T> list) {
-        SqlAndParams qp = statement.insertBatchSQL(list);
-        if (qp.succeeded()) {
-            return execute.batch(qp)
-                    .map(rows -> (long) rows.size());
-        } else {
-            return Future.succeededFuture(0L);
-        }
-    }
-
-    @Override
-    public Future<Long> insertBatch(List<String> columns, List<JsonArray> params) {
-        SqlAndParams qp = statement.insertBatchSQL(columns, params);
-        if (qp.succeeded()) {
-            return execute.batch(qp).map(rows -> (long) rows.size());
-        } else {
-            return Future.succeededFuture(0L);
-        }
     }
 
     @Override

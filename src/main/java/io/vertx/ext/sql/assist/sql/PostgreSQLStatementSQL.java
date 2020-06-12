@@ -22,11 +22,6 @@ public class PostgreSQLStatementSQL extends AbstractStatementSQL {
 	}
 
 	@Override
-	public AbstractStatementSQL setSqlTableName(String sqlTableName) {
-		return super.setSqlTableName(sqlTableName);
-	}
-
-	@Override
 	protected String getSqlTableColumns(String value) {
 		return "\""+value+"\"";
 	}
@@ -82,78 +77,6 @@ public class PostgreSQLStatementSQL extends AbstractStatementSQL {
 		}
 		String sql = String.format("insert into %s (%s) values (%s) ON CONFLICT(%s) do update set %s",
 				getSqlTableName(), tempColumn, tempValues,getSqlPrimaryId(),updateItems);
-		SqlAndParams result = new SqlAndParams(sql, params);
-		if (LOG.isDebugEnabled()) {
-			LOG.debug("insertAllSQL : " + result.toString());
-		}
-		return result;
-	}
-
-	@Override
-	public <T> SqlAndParams insertAllSQLReturnId(T obj) {
-		JsonArray params = null;
-		StringBuilder tempColumn = null;
-		StringBuilder tempValues = null;
-		List<SqlPropertyValue<?>> propertyValue;
-		try {
-			propertyValue = getPropertyValue(obj);
-		} catch (Exception e) {
-			return new SqlAndParams(false, " Get SqlPropertyValue failed: " + e.getMessage());
-		}
-		for (SqlPropertyValue<?> pv : propertyValue) {
-			if (tempColumn == null) {
-				tempColumn = new StringBuilder(pv.getName());
-				tempValues = new StringBuilder("?");
-				params = new JsonArray();
-			} else {
-				tempColumn.append(",").append(pv.getName());
-				tempValues.append(",?");
-			}
-			if (pv.getValue() != null) {
-				params.add(pv.getValue());
-			} else {
-				params.addNull();
-			}
-		}
-		String sql = String.format("insert into %s (%s) values (%s) returning %s", getSqlTableName(), tempColumn, tempValues,getSqlPrimaryId());
-		SqlAndParams result = new SqlAndParams(sql, params);
-		if (LOG.isDebugEnabled()) {
-			LOG.debug("insertAllSQL : " + result.toString());
-		}
-		return result;
-	}
-
-	@Override
-	public <T> SqlAndParams upsertAllSQLReturnId(T obj) {
-		JsonArray params = null;
-		StringBuilder tempColumn = null;
-		StringBuilder tempValues = null;
-		StringBuilder updateItems = null;
-		List<SqlPropertyValue<?>> propertyValue;
-		try {
-			propertyValue = getPropertyValue(obj);
-		} catch (Exception e) {
-			return new SqlAndParams(false, " Get SqlPropertyValue failed: " + e.getMessage());
-		}
-		for (SqlPropertyValue<?> pv : propertyValue) {
-			if (tempColumn == null) {
-				updateItems = new StringBuilder(pv.getName()).append("=").append("excluded.").append(pv.getName());
-				tempColumn = new StringBuilder(pv.getName());
-				tempValues = new StringBuilder("?");
-				params = new JsonArray();
-			} else {
-				updateItems.append(",").append(pv.getName()).append("=").append("excluded.").append(pv.getName());
-				tempColumn.append(",").append(pv.getName());
-				tempValues.append(",?");
-			}
-			if (pv.getValue() != null) {
-				params.add(pv.getValue());
-			} else {
-				params.addNull();
-			}
-		}
-		String sql = String.format("insert into %s (%s) values (%s) ON CONFLICT(%s) do update set %s returning %s",
-				getSqlTableName(), tempColumn, tempValues,getSqlPrimaryId(),updateItems,getSqlPrimaryId());
 		SqlAndParams result = new SqlAndParams(sql, params);
 		if (LOG.isDebugEnabled()) {
 			LOG.debug("insertAllSQL : " + result.toString());
@@ -221,42 +144,6 @@ public class PostgreSQLStatementSQL extends AbstractStatementSQL {
 			}
 		}
 		String sql = String.format("insert into %s (%s) values (%s) returning %s", getSqlTableName(), tempColumn, tempValues,getSqlPrimaryId());
-		SqlAndParams result = new SqlAndParams(sql, params);
-		if (this.getLOG().isDebugEnabled()) {
-			this.getLOG().debug("insertNonEmptySQL : " + result.toString());
-		}
-		return result;
-	}
-
-	@Override
-	public <T> SqlAndParams upsertNonEmptySQLReturnId(T obj) {
-		JsonArray params = null;
-		StringBuilder tempColumn = null;
-		StringBuilder tempValues = null;
-		StringBuilder updateItems = null;
-		List<SqlPropertyValue<?>> propertyValue;
-		try {
-			propertyValue = getPropertyValue(obj);
-		} catch (Exception e) {
-			return new SqlAndParams(false, " Get SqlPropertyValue failed: " + e.getMessage());
-		}
-		for (SqlPropertyValue<?> pv : propertyValue) {
-			if (pv.getValue() != null) {
-				if (tempColumn == null) {
-					updateItems = new StringBuilder(pv.getName()).append("=").append("excluded.").append(pv.getName());
-					tempColumn = new StringBuilder(pv.getName());
-					tempValues = new StringBuilder("?");
-					params = new JsonArray();
-				} else {
-					updateItems.append(",").append(pv.getName()).append("=").append("excluded.").append(pv.getName());
-					tempColumn.append(",").append(pv.getName());
-					tempValues.append(",?");
-				}
-				params.add(pv.getValue());
-			}
-		}
-		String sql = String.format("insert into %s (%s) values (%s) ON CONFLICT(%s) do update set %s returning %s",
-				getSqlTableName(), tempColumn, tempValues,getSqlPrimaryId(),updateItems,getSqlPrimaryId());
 		SqlAndParams result = new SqlAndParams(sql, params);
 		if (this.getLOG().isDebugEnabled()) {
 			this.getLOG().debug("insertNonEmptySQL : " + result.toString());

@@ -60,31 +60,6 @@ public abstract class CommonSQL<E, C> implements CommonSQLClinet<C> {
 	}
 
 	@Override
-	public Future<JsonObject> queryAsObj(SqlAndParams qp) {
-		return execute.queryAsObj(qp);
-	}
-
-	@Override
-	public Future<List<JsonObject>> queryAsListObj(SqlAndParams qp) {
-		return execute.queryAsListObj(qp);
-	}
-
-	@Override
-	public Future<List<JsonArray>> queryAsListArray(SqlAndParams qp) {
-		return execute.queryAsListArray(qp);
-	}
-
-	@Override
-	public Future<Integer> update(SqlAndParams qp) {
-		return execute.update(qp);
-	}
-
-	@Override
-	public Future<List<Integer>> batch(SqlAndParams qp) {
-		return execute.batch(qp);
-	}
-
-	@Override
 	public Future<Long> getCount() {
 		return command.getCount();
 	}
@@ -120,11 +95,6 @@ public abstract class CommonSQL<E, C> implements CommonSQLClinet<C> {
 	}
 
 	@Override
-	public <S> Future<JsonObject> selectById(S primaryValue, String resultColumns, String joinOrReference) {
-		return command.selectById(primaryValue, resultColumns, joinOrReference);
-	}
-
-	@Override
 	public <T> Future<JsonObject> selectSingleByObj(T obj) {
 		return command.selectSingleByObj(obj);
 	}
@@ -132,11 +102,6 @@ public abstract class CommonSQL<E, C> implements CommonSQLClinet<C> {
 	@Override
 	public <T> Future<JsonObject> selectSingleByObj(T obj, String resultColumns) {
 		return command.selectSingleByObj(obj, resultColumns);
-	}
-
-	@Override
-	public <T> Future<JsonObject> selectSingleByObj(T obj, String resultColumns, String joinOrReference) {
-		return command.selectSingleByObj(obj, resultColumns, joinOrReference);
 	}
 
 	@Override
@@ -150,11 +115,6 @@ public abstract class CommonSQL<E, C> implements CommonSQLClinet<C> {
 	}
 
 	@Override
-	public <T> Future<List<JsonObject>> selectByObj(T obj, String resultColumns, String joinOrReference) {
-		return command.selectByObj(obj, resultColumns, joinOrReference);
-	}
-
-	@Override
 	public <T> Future<Integer> insertAll(T obj) {
 		return command.insertAll(obj);
 	}
@@ -163,17 +123,6 @@ public abstract class CommonSQL<E, C> implements CommonSQLClinet<C> {
 	public <T> Future<Integer> upsertAll(T obj) {
 		return command.upsertAll(obj);
 	}
-
-	@Override
-	public <T> Future<JsonArray> insertAllReturnId(T obj) {
-		return command.insertAllReturnId(obj);
-	}
-
-	@Override
-	public <T> Future<JsonArray> upsertAllReturnId(T obj) {
-		return command.upsertAllReturnId(obj);
-	}
-
 	@Override
 	public <T> Future<Integer> insertNonEmpty(T obj) {
 		return command.insertNonEmpty(obj);
@@ -187,21 +136,6 @@ public abstract class CommonSQL<E, C> implements CommonSQLClinet<C> {
 	@Override
 	public <T> Future<JsonArray> insertNonEmptyReturnId(T obj) {
 		return command.insertNonEmptyReturnId(obj);
-	}
-
-	@Override
-	public <T> Future<JsonArray> upsertNonEmptyReturnId(T obj) {
-		return command.upsertNonEmptyReturnId(obj);
-	}
-
-	@Override
-	public <T> Future<Long> insertBatch(List<T> list) {
-		return command.insertBatch(list);
-	}
-
-	@Override
-	public Future<Long> insertBatch(List<String> columns, List<JsonArray> params) {
-		return command.insertBatch(columns, params);
 	}
 
 	@Override

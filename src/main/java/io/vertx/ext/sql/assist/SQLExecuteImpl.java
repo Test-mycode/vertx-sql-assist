@@ -3,6 +3,7 @@ package io.vertx.ext.sql.assist;
 import java.util.List;
 
 import io.vertx.core.Future;
+import io.vertx.core.Promise;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
@@ -79,47 +80,20 @@ public class SQLExecuteImpl implements SQLExecute<SQLClient> {
                 .map(UpdateResult::getUpdated);
     }
 
-    @Override
-    public Future<List<Integer>> batch(SqlAndParams qp) {
-        Future<List<Integer>> result = Future.future();
-        client.getConnection(conn -> {
-            if (conn.succeeded()) {
-                SQLConnection connection = conn.result();
-                connection.batchWithParams(qp.getSql(), qp.getBatchParams(), res -> {
-                    if (res.succeeded()) {
-                        connection.close(close -> {
-                            if (close.succeeded()) {
-                                result.handle(Future.succeededFuture(res.result()));
-                            } else {
-                                result.handle(Future.failedFuture(close.cause()));
-                            }
-                        });
-                    } else {
-                        result.handle(Future.failedFuture(res.cause()));
-                        connection.close();
-                    }
-                });
-            } else {
-                result.handle(Future.failedFuture(conn.cause()));
-            }
-        });
-        return result;
-    }
-
     /**
      * 执行查询
      *
      * @param qp
      */
     public Future<ResultSet> queryExecute(SqlAndParams qp) {
-        Future<ResultSet> result = Future.future();
+        Promise<ResultSet> result = Promise.promise();
         this.logSqlAndParam(qp.getSql(), qp.getParams());
         if (qp.getParams() == null) {
             client.query(qp.getSql(), result);
         } else {
             client.queryWithParams(qp.getSql(), qp.getParams(), result);
         }
-        return result;
+        return result.future();
     }
 
     /**
@@ -128,14 +102,14 @@ public class SQLExecuteImpl implements SQLExecute<SQLClient> {
      * @param qp
      */
     public Future<UpdateResult> updateExecute(SqlAndParams qp) {
-        Future<UpdateResult> result = Future.future();
+        Promise<UpdateResult> result = Promise.promise();
         this.logSqlAndParam(qp.getSql(), qp.getParams());
         if (qp.getParams() == null) {
             client.update(qp.getSql(), result);
         } else {
             client.updateWithParams(qp.getSql(), qp.getParams(), result);
         }
-        return result;
+        return result.future();
     }
 
     private void logSqlAndParam(String sql, JsonArray params) {

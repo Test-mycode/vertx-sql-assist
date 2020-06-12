@@ -109,7 +109,7 @@ public abstract class AbstractStatementSQL implements SQLStatement {
 
 	/**
 	 * 设置表名称
-	 * 
+	 *
 	 * @param sqlTableName
 	 * @return
 	 */
@@ -418,78 +418,6 @@ public abstract class AbstractStatementSQL implements SQLStatement {
 			this.getLOG().debug("insertNonEmptySQL : " + result.toString());
 		}
 		return result;
-	}
-
-	@Override
-	public <T> SqlAndParams insertBatchSQL(List<T> list) {
-		if (list == null || list.isEmpty()) {
-			return new SqlAndParams(false, "The param can not be null or empty");
-		}
-		StringBuilder tempColumn = null;
-		StringBuilder tempValues = null;
-		JsonArray param0 = new JsonArray();
-		List<SqlPropertyValue<?>> propertyValue;
-		try {
-			propertyValue = getPropertyValue(list.get(0));
-		} catch (Exception e) {
-			return new SqlAndParams(false, " Get SqlPropertyValue failed: " + e.getMessage());
-		}
-		for (SqlPropertyValue<?> pv : propertyValue) {
-			if (tempColumn == null) {
-				tempColumn = new StringBuilder(pv.getName());
-				tempValues = new StringBuilder("?");
-			} else {
-				tempColumn.append(",").append(pv.getName());
-				tempValues.append(",?");
-			}
-			param0.add(pv.getValue());
-		}
-		List<JsonArray> params = new ArrayList<>();
-		params.add(param0);
-		for (int i = 1; i < list.size(); i++) {
-			JsonArray paramx = new JsonArray();
-			List<SqlPropertyValue<?>> propertyValue1;
-			try {
-				propertyValue1 = getPropertyValue(list.get(i));
-			} catch (Exception e) {
-				return new SqlAndParams(false, " Get SqlPropertyValue failed: " + e.getMessage());
-			}
-			for (SqlPropertyValue<?> pv : propertyValue1) {
-				paramx.add(pv.getValue());
-			}
-			params.add(paramx);
-		}
-
-		String sql = String.format("insert into %s (%s) values (%s) ", getSqlTableName(), tempColumn, tempValues);
-		SqlAndParams qp = new SqlAndParams(sql, params);
-		if (this.getLOG().isDebugEnabled()) {
-			this.getLOG().debug("insertBatch : " + qp.toString());
-		}
-		return qp;
-	}
-
-	@Override
-	public SqlAndParams insertBatchSQL(List<String> columns, List<JsonArray> params) {
-		if ((columns == null || columns.isEmpty()) || (params == null || params.isEmpty())) {
-			return new SqlAndParams(false, "The columns and params can not be null or empty");
-		}
-		StringBuilder tempColumn = null;
-		StringBuilder tempValues = null;
-		for (String column : columns) {
-			if (tempColumn == null) {
-				tempColumn = new StringBuilder(column);
-				tempValues = new StringBuilder("?");
-			} else {
-				tempColumn.append(",").append(column);
-				tempValues.append(",?");
-			}
-		}
-		String sql = String.format("insert into %s (%s) values (%s) ", getSqlTableName(), tempColumn, tempValues);
-		SqlAndParams qp = new SqlAndParams(sql, params);
-		if (this.getLOG().isDebugEnabled()) {
-			this.getLOG().debug("insertBatch : " + qp.toString());
-		}
-		return qp;
 	}
 
 	@Override

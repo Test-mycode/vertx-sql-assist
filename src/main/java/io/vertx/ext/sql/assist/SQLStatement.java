@@ -142,23 +142,6 @@ public interface SQLStatement {
 	 */
 	<T> SqlAndParams upsertAllSQL(T obj);
 
-	/**
-	 * 插入一个对象包括属性值为null的值<br>
-	 *
-	 * @param obj
-	 * @return 返回:sql 或者 sql与params
-	 */
-	<T> SqlAndParams insertAllSQLReturnId(T obj);
-
-
-	/**
-	 * 插入一个对象包括属性值为null的值<br>
-	 *
-	 * @param obj
-	 * @return 返回:sql 或者 sql与params
-	 */
-	<T> SqlAndParams upsertAllSQLReturnId(T obj);
-
 
 	/**
 	 * 插入一个对象,只插入对象中值不为null的属性<br>
@@ -188,34 +171,6 @@ public interface SQLStatement {
 	 * @return 返回:sql 或 sql与params
 	 */
 	<T> SqlAndParams insertNonEmptySQLReturnId(T obj);
-
-
-
-	/**
-	 * 插入一个对象,只插入对象中值不为null的属性<br>
-	 *
-	 * @param obj
-	 *          对象
-	 * @return 返回:sql 或 sql与params
-	 */
-	<T> SqlAndParams upsertNonEmptySQLReturnId(T obj);
-
-	/**
-	 * 批量添加全部所有字段
-	 * 
-	 * @param list
-	 *          对象
-	 */
-	<T> SqlAndParams insertBatchSQL(List<T> list);
-	/**
-	 * 批量添加自定字段
-	 * 
-	 * @param columns
-	 *          字段的名称示例:["id","name",...]
-	 * @param params
-	 *          字段对应的参数示例:[["id","name"],["id","name"]...]
-	 */
-	SqlAndParams insertBatchSQL(List<String> columns, List<JsonArray> params);
 
 	/**
 	 * 插入一个对象,如果该对象不存在就新建如果该对象已经存在就更新

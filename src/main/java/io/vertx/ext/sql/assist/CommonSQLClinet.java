@@ -23,57 +23,6 @@ public interface CommonSQLClinet<C> {
 	C getDbClient();
 
 	/**
-	 * 执行查询
-	 * 
-	 * @param qp
-	 *          SQL语句与参数
-	 * @return future
-	 *          返回结果
-	 */
-	Future<JsonObject> queryAsObj(SqlAndParams qp);
-
-	/**
-	 * 执行查询
-	 * 
-	 * @param qp
-	 *          SQL语句与参数
-	 * @return future
-	 *          返回结果
-	 */
-	Future<List<JsonObject>> queryAsListObj(SqlAndParams qp);
-
-	/**
-	 * 执行查询
-	 * 
-	 * @param qp
-	 *          SQL语句与参数
-	 * @return future
-	 *          返回结果
-	 */
-	Future<List<JsonArray>> queryAsListArray(SqlAndParams qp);
-
-	/**
-	 * 执行更新等操作得到受影响的行数
-	 * 
-	 * @param qp
-	 *          SQL语句与参数
-	 *
-	 * @return future
-	 */
-	Future<Integer> update(SqlAndParams qp);
-
-	/**
-	 * 批量操作
-	 * 
-	 * @param qp
-	 *          SQL语句与批量参数
-	 *
-	 * @return future
-	 *          返回结果
-	 */
-	Future<List<Integer>> batch(SqlAndParams qp);
-
-	/**
 	 * 获得数据总行数
 	 *
 	 * @return future
@@ -81,9 +30,11 @@ public interface CommonSQLClinet<C> {
 	 */
 	Future<Long> getCount();
 
+
+
 	/**
 	 * 获取数据总行数
-	 * 
+	 *
 	 * @param assist
 	 *          查询工具,如果没有可以为null
 	 * @return future
@@ -142,20 +93,6 @@ public interface CommonSQLClinet<C> {
 	<S> Future<JsonObject> selectById(S primaryValue, String resultColumns);
 
 	/**
-	 * 通过ID查询出数据,并自定义返回列
-	 * 
-	 * @param primaryValue
-	 *          主键值
-	 * @param resultColumns
-	 *          自定义返回列
-	 * @param joinOrReference
-	 *          多表查询或表连接的语句,示例 as t inner join table2 as t2 on t.id=t2.id
-	 * @return future
-	 *          返回结果:如果查询得到返回JsonObject如果查询不到返回null
-	 */
-	<S> Future<JsonObject> selectById(S primaryValue, String resultColumns, String joinOrReference);
-
-	/**
 	 * 将对象属性不为null的属性作为条件查询出数据,只取查询出来的第一条数据;
 	 * 
 	 * @param obj
@@ -178,20 +115,6 @@ public interface CommonSQLClinet<C> {
 	 *          结果:如果存在返回JsonObject,不存在返回null
 	 */
 	<T> Future<JsonObject> selectSingleByObj(T obj, String resultColumns);
-
-	/**
-	 * 将对象属性不为null的属性作为条件查询出数据,只取查询出来的第一条数据
-	 * 
-	 * @param obj
-	 *          对象
-	 * @param resultColumns
-	 *          自定义返回列
-	 * @param joinOrReference
-	 *          多表查询或表连接的语句,示例 as t inner join table2 as t2 on t.id=t2.id
-	 * @return future
-	 *          结果:如果存在返回JsonObject,不存在返回null
-	 */
-	<T> Future<JsonObject> selectSingleByObj(T obj, String resultColumns, String joinOrReference);
 
 	/**
 	 * 将对象属性不为null的属性作为条件查询出数据
@@ -218,20 +141,6 @@ public interface CommonSQLClinet<C> {
 	<T> Future<List<JsonObject>> selectByObj(T obj, String resultColumns);
 
 	/**
-	 * 将对象属性不为null的属性作为条件查询出数据
-	 * 
-	 * @param obj
-	 *          对象
-	 * @param resultColumns
-	 *          自定义返回列
-	 * @param joinOrReference
-	 *          多表查询或表连接的语句,示例 as t inner join table2 as t2 on t.id=t2.id
-	 * @return future
-	 *          返回结果集
-	 */
-	<T> Future<List<JsonObject>> selectByObj(T obj, String resultColumns, String joinOrReference);
-
-	/**
 	 * 插入一个对象包括属性值为null的值
 	 * 
 	 * @param obj
@@ -243,18 +152,6 @@ public interface CommonSQLClinet<C> {
 
 
 	<T> Future<Integer> upsertAll(T obj);
-
-	/**
-	 * 插入一个对象包括属性值为null的值
-	 *
-	 * @param obj
-	 *          对象
-	 * @return future
-	 *          返回操作结果
-	 */
-	<T> Future<JsonArray> insertAllReturnId(T obj);
-
-	<T> Future<JsonArray> upsertAllReturnId(T obj);
 
 	/**
 	 * 插入一个对象,只插入对象中值不为null的属性
@@ -278,30 +175,6 @@ public interface CommonSQLClinet<C> {
 	 *          返回操作结果
 	 */
 	<T> Future<JsonArray> insertNonEmptyReturnId(T obj);
-
-	<T> Future<JsonArray> upsertNonEmptyReturnId(T obj);
-
-	/**
-	 * 批量添加全部所有字段
-	 * 
-	 * @param list
-	 *          对象
-	 * @return future
-	 *          成功返回受影响的行数,如果对象为null或空则返回0
-	 */
-	<T> Future<Long> insertBatch(List<T> list);
-
-	/**
-	 * 批量添加自定字段
-	 * 
-	 * @param columns
-	 *          字段的名称示例:["id","name",...]
-	 * @param params
-	 *          字段对应的参数示例:[["id","name"],["id","name"]...]
-	 * @return future
-	 *          成功返回受影响的行数,如果字段或字段参数为null或空则返回0
-	 */
-	Future<Long> insertBatch(List<String> columns, List<JsonArray> params);
 
 	/**
 	 * 插入一个对象,如果该对象不存在就新建如果该对象已经存在就更新

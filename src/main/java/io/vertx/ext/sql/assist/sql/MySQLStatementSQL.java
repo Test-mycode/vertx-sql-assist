@@ -91,16 +91,6 @@ public class MySQLStatementSQL extends AbstractStatementSQL {
 	}
 
 	@Override
-	public <T> SqlAndParams insertAllSQLReturnId(T obj) {
-		return this.insertAllSQL(obj);
-	}
-
-	@Override
-	public <T> SqlAndParams upsertAllSQLReturnId(T obj) {
-		return this.upsertAllSQL(obj);
-	}
-
-	@Override
 	public <T> SqlAndParams upsertNonEmptySQL(T obj) {
 		JsonArray params = null;
 		StringBuilder tempColumn = null;
@@ -138,10 +128,5 @@ public class MySQLStatementSQL extends AbstractStatementSQL {
 	@Override
 	public <T> SqlAndParams insertNonEmptySQLReturnId(T obj) {
 		return this.insertNonEmptySQL(obj);
-	}
-
-	@Override
-	public <T> SqlAndParams upsertNonEmptySQLReturnId(T obj) {
-		return this.upsertAllSQL(obj);
 	}
 }

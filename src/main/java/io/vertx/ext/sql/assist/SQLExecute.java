@@ -7,8 +7,6 @@ import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.ext.sql.SQLClient;
-import io.vertx.mysqlclient.MySQLPool;
-import io.vertx.pgclient.PgPool;
 
 /**
  * SQL执行器
@@ -25,14 +23,6 @@ public interface SQLExecute<T> {
 	 */
 	static SQLExecute<SQLClient> create(SQLClient client) {
 		return new SQLExecuteImpl(client);
-	}
-
-	static SQLExecute<MySQLPool> createMySql(MySQLPool client) {
-		return new SQLExecuteMySQLImpl(client);
-	}
-
-	static SQLExecute<PgPool> createPg(PgPool client) {
-		return new SQLExecutePgImpl(client);
 	}
 
 	/**
@@ -97,16 +87,5 @@ public interface SQLExecute<T> {
 	 * @return future
 	 */
 	Future<Integer> update(SqlAndParams qp);
-
-	/**
-	 * 批量操作
-	 * 
-	 * @param qp
-	 *          SQL语句与批量参数
-	 * 
-	 * @return future
-	 *          返回结果
-	 */
-	Future<List<Integer>> batch(SqlAndParams qp);
 
 }

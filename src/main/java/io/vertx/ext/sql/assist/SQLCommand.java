@@ -224,28 +224,6 @@ public interface SQLCommand {
 	 */
 	<T> Future<Integer> upsertAll(T obj);
 
-
-	/**
-	 * 插入一个对象包括属性值为null的值并返回id
-	 *
-	 * @param obj
-	 *          对象
-	 * @return future
-	 *          返回操作结果
-	 */
-	<T> Future<JsonArray> insertAllReturnId(T obj);
-
-
-	/**
-	 * 插入一个对象包括属性值为null的值并返回id
-	 *
-	 * @param obj
-	 *          对象
-	 * @return future
-	 *          返回操作结果
-	 */
-	<T> Future<JsonArray> upsertAllReturnId(T obj);
-
 	/**
 	 * 插入一个对象,只插入对象中值不为null的属性
 	 * 
@@ -278,38 +256,6 @@ public interface SQLCommand {
 	 *          返回操作结果
 	 */
 	<T> Future<JsonArray> insertNonEmptyReturnId(T obj);
-
-
-	/**
-	 * 插入一个对象,只插入对象中值不为null的属性
-	 *
-	 * @param obj
-	 *          对象
-	 * @return future
-	 *          返回操作结果
-	 */
-	<T> Future<JsonArray> upsertNonEmptyReturnId(T obj);
-
-	/**
-	 * 批量添加全部所有字段
-	 * 
-	 * @param list
-	 *          对象
-	 * @return future
-	 *          成功返回受影响的行数,如果对象为null或空则返回0
-	 */
-	<T> Future<Long> insertBatch(List<T> list);
-	/**
-	 * 批量添加自定字段
-	 * 
-	 * @param columns
-	 *          字段的名称示例:["id","name",...]
-	 * @param params
-	 *          字段对应的参数示例:[["id","name"],["id","name"]...]
-	 * @return future
-	 *          成功返回受影响的行数,如果字段或字段参数为null或空则返回0
-	 */
-	Future<Long> insertBatch(List<String> columns, List<JsonArray> params);
 
 	/**
 	 * 插入一个对象,如果该对象不存在就新建如果该对象已经存在就更新
@@ -369,8 +315,7 @@ public interface SQLCommand {
 
 	/**
 	 * 通过主键值设置指定的列为空
-	 * 
-	 * @param <S>
+	 *
 	 * @param primaryValue
 	 *          主键
 	 * @param columns

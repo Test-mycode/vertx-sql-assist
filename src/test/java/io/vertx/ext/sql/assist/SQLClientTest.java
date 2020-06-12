@@ -52,7 +52,7 @@ public class SQLClientTest {
         List<JsonObject> res = userSql.selectAll(new SqlAssist().andIn("id",1,2,3)).toCompletionStage().toCompletableFuture().get();
 
         //
-        JsonArray returnId = userSql.upsertAllReturnId(user).toCompletionStage().toCompletableFuture().get();
+        JsonArray returnId = userSql.insertNonEmptyReturnId(user).toCompletionStage().toCompletableFuture().get();
 
         //
         userSql.getCount().toCompletionStage().toCompletableFuture().get();
@@ -71,11 +71,6 @@ public class SQLClientTest {
 
         //
         userSql.deleteByAssist(new SqlAssist().andEq("id", 2)).toCompletionStage().toCompletableFuture().get();
-
-        List<User> list = new ArrayList<>();
-        list.add(user);
-        list.add(user);
-        userSql.insertBatch(list).toCompletionStage().toCompletableFuture().get();
 
         //
         User user2 = new User();
