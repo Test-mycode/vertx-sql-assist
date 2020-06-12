@@ -17,7 +17,7 @@ import io.vertx.core.json.JsonObject;
  * @param <C>
  *          SQL执行器的客户端类型,比如JDBCClient
  */
-public abstract class CommonSQL<E, C> implements CommonSQLClinet<C> {
+public abstract class CommonSQL<E, C> implements CommonSQLClient<C> {
 	/** SQL 执行器 */
 	private SQLExecute<C> execute;
 	/** SQL 命令 */
