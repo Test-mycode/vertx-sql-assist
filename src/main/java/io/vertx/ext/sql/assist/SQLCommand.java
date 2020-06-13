@@ -14,6 +14,15 @@ import io.vertx.core.json.JsonObject;
  */
 public interface SQLCommand {
 	/**
+	 * 分页查询,默认page=1,rowSize=15(取第一页,每页取15行数据)
+	 *
+	 * @param assist
+	 *          查询工具(注意:startRow在该方法中无效,最后会有page转换为startRow)
+	 * @return future
+	 *          返回结果为(JsonObject)格式为: {@link SqlLimitResult#toJson()}
+	 */
+
+	/**
 	 * 获得数据总行数
 	 * 
 	 * @return future
@@ -22,16 +31,16 @@ public interface SQLCommand {
 	default Future<Long> getCount() {
 		return getCount(null);
 	}
+
 	/**
 	 * 获取数据总行数
-	 * 
+	 *
 	 * @param assist
 	 *          查询工具,如果没有可以为null
 	 * @return future
 	 *          返回数据总行数
 	 */
 	Future<Long> getCount(SqlAssist assist);
-
 	/**
 	 * 查询所有数据
 	 * 
@@ -41,9 +50,10 @@ public interface SQLCommand {
 	default Future<List<JsonObject>> selectAll() {
 		return selectAll(null);
 	}
+
 	/**
 	 * 通过查询工具查询所有数据
-	 * 
+	 *
 	 * @param assist
 	 *          查询工具帮助类
 	 * @return future
@@ -51,14 +61,6 @@ public interface SQLCommand {
 	 */
 	Future<List<JsonObject>> selectAll(SqlAssist assist);
 
-	/**
-	 * 分页查询,默认page=1,rowSize=15(取第一页,每页取15行数据)
-	 * 
-	 * @param assist
-	 *          查询工具(注意:startRow在该方法中无效,最后会有page转换为startRow)
-	 * @return future
-	 *          返回结果为(JsonObject)格式为: {@link SqlLimitResult#toJson()}
-	 */
 	default Future<JsonObject> limitAll(final SqlAssist assist) {
 		if (assist == null) {
 			return Future.failedFuture("The SqlAssist cannot be null , you can pass in new SqlAssist()");
@@ -85,11 +87,12 @@ public interface SQLCommand {
 								.map(SqlLimitResult::toJson);
 					}
 				});
+
 	};
 
 	/**
 	 * 通过ID查询出数据
-	 * 
+	 *
 	 * @param primaryValue
 	 *          主键值
 	 * @return future
@@ -101,7 +104,7 @@ public interface SQLCommand {
 
 	/**
 	 * 通过ID查询出数据
-	 * 
+	 *
 	 * @param primaryValue
 	 *          主键值
 	 * @param resultColumns
@@ -112,7 +115,6 @@ public interface SQLCommand {
 	default <S> Future<JsonObject> selectById(S primaryValue, String resultColumns) {
 		return selectById(primaryValue, resultColumns, null);
 	}
-
 	/**
 	 * 通过ID查询出数据,并自定义返回列
 	 * 
@@ -189,9 +191,10 @@ public interface SQLCommand {
 	default <T> Future<List<JsonObject>> selectByObj(T obj, String resultColumns) {
 		return selectByObj(obj, resultColumns, null);
 	}
+
 	/**
 	 * 将对象属性不为null的属性作为条件查询出数据
-	 * 
+	 *
 	 * @param obj
 	 *          对象
 	 * @param resultColumns
@@ -205,7 +208,7 @@ public interface SQLCommand {
 
 	/**
 	 * 插入一个对象包括属性值为null的值
-	 * 
+	 *
 	 * @param obj
 	 *          对象
 	 * @return future
@@ -226,7 +229,7 @@ public interface SQLCommand {
 
 	/**
 	 * 插入一个对象,只插入对象中值不为null的属性
-	 * 
+	 *
 	 * @param obj
 	 *          对象
 	 * @return future
@@ -259,10 +262,10 @@ public interface SQLCommand {
 
 	/**
 	 * 插入一个对象,如果该对象不存在就新建如果该对象已经存在就更新
-	 * 
+	 *
 	 * @param obj
 	 *          对象
-	 * 
+	 *
 	 * @return future
 	 *          结果集受影响的行数
 	 */
@@ -270,15 +273,14 @@ public interface SQLCommand {
 
 	/**
 	 * 更新一个对象中所有的属性包括null值,条件为对象中的主键值
-	 * 
+	 *
 	 * @param obj
 	 *          对象
-	 * 
+	 *
 	 * @return future
 	 *          返回操作结果
 	 */
 	<T> Future<Integer> updateAllById(T obj);
-
 	/**
 	 * 更新一个对象中所有的属性包括null值,条件为SqlAssist条件集<br>
 	 * 
@@ -291,9 +293,10 @@ public interface SQLCommand {
 	 *          返回操作结果
 	 */
 	<T> Future<Integer> updateAllByAssist(T obj, SqlAssist assist);
+
 	/**
 	 * 更新一个对象中属性不为null值,条件为对象中的主键值
-	 * 
+	 *
 	 * @param obj
 	 *          对象
 	 * @return future
@@ -303,7 +306,7 @@ public interface SQLCommand {
 
 	/**
 	 * 更新一个对象中属性不为null值,条件为SqlAssist条件集
-	 * 
+	 *
 	 * @param obj
 	 *          对象
 	 * @param assist
@@ -320,7 +323,7 @@ public interface SQLCommand {
 	 *          主键
 	 * @param columns
 	 *          要设置为null的列
-	 * 
+	 *
 	 * @return future
 	 *          返回操作结果
 	 */
@@ -328,17 +331,16 @@ public interface SQLCommand {
 
 	/**
 	 * 通过Assist作为条件设置指定的列为空
-	 * 
+	 *
 	 * @param assist
 	 *          sql帮助工具
 	 * @param columns
 	 *          要设置为null的列
-	 * 
+	 *
 	 * @return future
 	 *          返回操作结果
 	 */
 	<T> Future<Integer> updateSetNullByAssist(SqlAssist assist, List<String> columns);
-
 	/**
 	 * 通过主键值删除对应的数据行
 	 * 
@@ -348,15 +350,15 @@ public interface SQLCommand {
 	 *          返回操作结果
 	 */
 	<S> Future<Integer> deleteById(S primaryValue);
+
 	/**
 	 * 通过SqlAssist条件集删除对应的数据行
-	 * 
+	 *
 	 * @param assist
 	 *          条件集
-	 * 
+	 *
 	 * @return future
 	 *          返回操作结果
 	 */
 	Future<Integer> deleteByAssist(SqlAssist assist);
-
 }

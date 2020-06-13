@@ -43,7 +43,7 @@ public class SQLClientTest {
 
     public static void main(String[] args) throws InterruptedException, ExecutionException {
         SQLClient client = getMysqlClient();
-        UserSQL userSql = new UserSQL(SQLExecute.create(client));
+        UserSQL userSql = new UserSQL(SQLExecute.createMySql(client));
         User user = new User();
         user.setId(3L);
         user.setName("test");

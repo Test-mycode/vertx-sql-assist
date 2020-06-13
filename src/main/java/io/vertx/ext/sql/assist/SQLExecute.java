@@ -7,6 +7,8 @@ import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.ext.sql.SQLClient;
+import io.vertx.ext.sql.assist.sql.MySQLStatementSQL;
+import io.vertx.ext.sql.assist.sql.PostgreSQLStatementSQL;
 
 /**
  * SQL执行器
@@ -23,6 +25,16 @@ public interface SQLExecute<T> {
 	 */
 	static SQLExecute<SQLClient> create(SQLClient client) {
 		return new SQLExecuteImpl(client);
+	}
+
+	static SQLExecute<SQLClient> createMySql(SQLClient client) {
+		SQLStatement.register(MySQLStatementSQL.class);
+		return new SQLExecuteMysqlImpl(client);
+	}
+
+	static SQLExecute<SQLClient> createPostgres(SQLClient client) {
+		SQLStatement.register(PostgreSQLStatementSQL.class);
+		return new SQLExecutePostgresqlImpl(client);
 	}
 
 	/**

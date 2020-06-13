@@ -21,7 +21,7 @@ public abstract class CommonSQL<E, C> implements CommonSQLClient<C> {
 	/** SQL 执行器 */
 	private SQLExecute<C> execute;
 	/** SQL 命令 */
-	private SQLCommand command;
+	private final SQLCommand command;
 
 	/**
 	 * 使用以注册或默认的{@link SQLStatement}
