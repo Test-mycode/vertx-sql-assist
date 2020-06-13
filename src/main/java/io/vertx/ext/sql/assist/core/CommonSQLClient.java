@@ -1,4 +1,4 @@
-package io.vertx.ext.sql.assist;
+package io.vertx.ext.sql.assist.core;
 
 import java.util.List;
 

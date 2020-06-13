@@ -6,10 +6,12 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.ext.asyncsql.MySQLClient;
 import io.vertx.ext.asyncsql.PostgreSQLClient;
 import io.vertx.ext.sql.SQLClient;
+import io.vertx.ext.sql.assist.core.SQLExecute;
+import io.vertx.ext.sql.assist.core.SQLStatement;
+import io.vertx.ext.sql.assist.core.SqlAssist;
 import io.vertx.ext.sql.assist.sql.MySQLStatementSQL;
 import io.vertx.ext.sql.assist.sql.PostgreSQLStatementSQL;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -45,7 +47,6 @@ public class SQLClientTest {
         SQLClient client = getMysqlClient();
         UserSQL userSql = new UserSQL(SQLExecute.createMySql(client));
         User user = new User();
-        user.setId(3L);
         user.setName("test");
         user.setPwd("123456");
 

@@ -3,8 +3,8 @@ package io.vertx.ext.sql.assist.sql;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
-import io.vertx.ext.sql.assist.SqlAndParams;
-import io.vertx.ext.sql.assist.SqlPropertyValue;
+import io.vertx.ext.sql.assist.core.SqlAndParams;
+import io.vertx.ext.sql.assist.core.SqlPropertyValue;
 
 import java.util.List;
 
@@ -22,27 +22,12 @@ public class MySQLStatementSQL extends AbstractStatementSQL {
 	}
 
 	@Override
-	protected String getSqlTableColumnsAlias(String alias) {
-		return "`"+alias+"`";
-	}
-
-	@Override
-	protected String getSqlTableColumns(String value) {
+	protected String getAliasNameValue(String value) {
 		return "`"+value+"`";
 	}
 
 	@Override
-	protected String getSqlPrimaryIdAlias(String value) {
-		return "`"+value+"`";
-	}
-
-	@Override
-	protected String getSqlPrimaryId(String value) {
-		return "`"+value+"`";
-	}
-
-	@Override
-	protected String getSqlTableName(String value) {
+	protected String getNameValue(String value) {
 		return "`"+value+"`";
 	}
 

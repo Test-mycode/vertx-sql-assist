@@ -1,4 +1,6 @@
-package io.vertx.ext.sql.assist;
+package io.vertx.ext.sql.assist.core;
+
+import java.util.List;
 
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
@@ -8,23 +10,20 @@ import io.vertx.core.logging.Logger;
 import io.vertx.ext.sql.ResultSet;
 import io.vertx.ext.sql.SQLClient;
 import io.vertx.ext.sql.UpdateResult;
-import io.vertx.ext.sql.assist.sql.PostgreSQLStatementSQL;
-
-import java.util.List;
 
 /**
  * JDBCClient版的SQL实现
  *
  * @author <a href="http://szmirren.com">Mirren</a>
  */
-public class SQLExecuteMysqlImpl implements SQLExecute<SQLClient> {
+public class SQLExecuteImpl implements SQLExecute<SQLClient> {
     private Logger logger;
     /**
      * SQL客户端
      */
     private final SQLClient client;
 
-    public SQLExecuteMysqlImpl(SQLClient client) {
+    public SQLExecuteImpl(SQLClient client) {
         super();
         this.client = client;
     }

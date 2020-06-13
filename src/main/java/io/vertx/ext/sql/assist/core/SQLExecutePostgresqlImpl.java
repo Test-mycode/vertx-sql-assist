@@ -1,6 +1,4 @@
-package io.vertx.ext.sql.assist;
-
-import java.util.List;
+package io.vertx.ext.sql.assist.core;
 
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
@@ -10,21 +8,22 @@ import io.vertx.core.logging.Logger;
 import io.vertx.ext.sql.ResultSet;
 import io.vertx.ext.sql.SQLClient;
 import io.vertx.ext.sql.UpdateResult;
-import io.vertx.ext.sql.assist.sql.PostgreSQLStatementSQL;
+
+import java.util.List;
 
 /**
  * JDBCClient版的SQL实现
  *
  * @author <a href="http://szmirren.com">Mirren</a>
  */
-public class SQLExecuteImpl implements SQLExecute<SQLClient> {
+public class SQLExecutePostgresqlImpl implements SQLExecute<SQLClient> {
     private Logger logger;
     /**
      * SQL客户端
      */
     private final SQLClient client;
 
-    public SQLExecuteImpl(SQLClient client) {
+    public SQLExecutePostgresqlImpl(SQLClient client) {
         super();
         this.client = client;
     }
@@ -65,12 +64,8 @@ public class SQLExecuteImpl implements SQLExecute<SQLClient> {
 
     @Override
     public Future<JsonArray> insert(SqlAndParams qp) {
-        if (PostgreSQLStatementSQL.class.getName().equals(SQLStatement.getStatementClassName()))
-            return this.queryExecute(qp)
-                    .map(resultSet -> resultSet.getResults().get(0));
-        else
-        	return this.updateExecute(qp)
-					.map(UpdateResult::getKeys);
+        return this.queryExecute(qp)
+                .map(resultSet -> resultSet.getResults().get(0));
     }
 
     @Override

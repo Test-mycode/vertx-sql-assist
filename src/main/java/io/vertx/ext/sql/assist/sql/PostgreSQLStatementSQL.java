@@ -3,8 +3,8 @@ package io.vertx.ext.sql.assist.sql;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
-import io.vertx.ext.sql.assist.SqlAndParams;
-import io.vertx.ext.sql.assist.SqlPropertyValue;
+import io.vertx.ext.sql.assist.core.SqlAndParams;
+import io.vertx.ext.sql.assist.core.SqlPropertyValue;
 
 import java.util.List;
 
@@ -22,28 +22,13 @@ public class PostgreSQLStatementSQL extends AbstractStatementSQL {
 	}
 
 	@Override
-	protected String getSqlTableColumns(String value) {
+	protected String getAliasNameValue(String value) {
 		return "\""+value+"\"";
 	}
 
 	@Override
-	protected String getSqlPrimaryIdAlias(String value) {
+	protected String getNameValue(String value) {
 		return "\""+value+"\"";
-	}
-
-	@Override
-	protected String getSqlPrimaryId(String value) {
-		return "\""+value+"\"";
-	}
-
-	@Override
-	protected String getSqlTableName(String value) {
-		return "\""+value+"\"";
-	}
-
-	@Override
-	protected String getSqlTableColumnsAlias(String alias) {
-		return "\""+alias+"\"";
 	}
 
 	@Override
@@ -76,7 +61,7 @@ public class PostgreSQLStatementSQL extends AbstractStatementSQL {
 			}
 		}
 		String sql = String.format("insert into %s (%s) values (%s) ON CONFLICT(%s) do update set %s",
-				getSqlTableName(), tempColumn, tempValues,getSqlPrimaryId(),updateItems);
+				getSqlTableName(), tempColumn, tempValues, getNameValue(),updateItems);
 		SqlAndParams result = new SqlAndParams(sql, params);
 		if (LOG.isDebugEnabled()) {
 			LOG.debug("insertAllSQL : " + result.toString());
@@ -111,7 +96,7 @@ public class PostgreSQLStatementSQL extends AbstractStatementSQL {
 				params.add(pv.getValue());
 			}
 		}
-		String sql = String.format("insert into %s (%s) values (%s) ON CONFLICT(%s) do update set %s", getSqlTableName(), tempColumn, tempValues,getSqlPrimaryId(),updateItems);
+		String sql = String.format("insert into %s (%s) values (%s) ON CONFLICT(%s) do update set %s", getSqlTableName(), tempColumn, tempValues, getNameValue(),updateItems);
 		SqlAndParams result = new SqlAndParams(sql, params);
 		if (this.getLOG().isDebugEnabled()) {
 			this.getLOG().debug("insertNonEmptySQL : " + result.toString());
@@ -143,7 +128,7 @@ public class PostgreSQLStatementSQL extends AbstractStatementSQL {
 				params.add(pv.getValue());
 			}
 		}
-		String sql = String.format("insert into %s (%s) values (%s) returning %s", getSqlTableName(), tempColumn, tempValues,getSqlPrimaryId());
+		String sql = String.format("insert into %s (%s) values (%s) returning %s", getSqlTableName(), tempColumn, tempValues, getNameValue());
 		SqlAndParams result = new SqlAndParams(sql, params);
 		if (this.getLOG().isDebugEnabled()) {
 			this.getLOG().debug("insertNonEmptySQL : " + result.toString());

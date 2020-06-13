@@ -1,4 +1,9 @@
 package io.vertx.ext.sql.assist;
+
+import io.vertx.ext.sql.assist.anno.Table;
+import io.vertx.ext.sql.assist.anno.TableColumn;
+import io.vertx.ext.sql.assist.anno.TableId;
+
 @Table("user")
 public class User {
 	/** 用户的id */
