@@ -44,8 +44,8 @@ public class SQLClientTest {
     }
 
     public static void main(String[] args) throws InterruptedException, ExecutionException {
-        SQLClient client = getMysqlClient();
-        UserSQL userSql = new UserSQL(SQLExecute.createMySql(client));
+        SQLClient client = getPostgresClient();
+        UserSQL userSql = new UserSQL(SQLExecute.createPostgres(client));
         User user = new User();
         user.setName("test");
         user.setPwd("123456");

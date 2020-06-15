@@ -7,6 +7,7 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.ext.sql.ResultSet;
 import io.vertx.ext.sql.SQLClient;
+import io.vertx.ext.sql.SQLOperations;
 import io.vertx.ext.sql.UpdateResult;
 
 import java.util.List;
@@ -16,20 +17,20 @@ import java.util.List;
  *
  * @author <a href="http://szmirren.com">Mirren</a>
  */
-public class SQLExecuteMysqlImpl implements SQLExecute<SQLClient> {
+public class SQLExecuteMysqlImpl implements SQLExecute<SQLOperations> {
     private Logger logger;
     /**
      * SQL客户端
      */
-    private final SQLClient client;
+    private final SQLOperations client;
 
-    public SQLExecuteMysqlImpl(SQLClient client) {
+    public SQLExecuteMysqlImpl(SQLOperations client) {
         super();
         this.client = client;
     }
 
     @Override
-    public SQLClient getClient() {
+    public SQLOperations getClient() {
         return client;
     }
 
@@ -107,7 +108,6 @@ public class SQLExecuteMysqlImpl implements SQLExecute<SQLClient> {
     }
 
     private void logSqlAndParam(String sql, JsonArray params) {
-        System.out.println(sql);
         if (logger == null) return;
         logger.info(sql);
         logger.info(params.toString());
