@@ -28,12 +28,12 @@ public interface SQLExecute<T> {
 		return new SQLExecuteImpl(client);
 	}
 
-	static SQLExecute<SQLOperations> createMySql(SQLClient client) {
+	static SQLExecute<SQLOperations> createMySql(SQLOperations client) {
 		SQLStatement.register(MySQLStatementSQL.class);
 		return new SQLExecuteMysqlImpl(client);
 	}
 
-	static SQLExecute<SQLOperations> createPostgres(SQLClient client) {
+	static SQLExecute<SQLOperations> createPostgres(SQLOperations client) {
 		SQLStatement.register(PostgreSQLStatementSQL.class);
 		return new SQLExecutePostgresqlImpl(client);
 	}
