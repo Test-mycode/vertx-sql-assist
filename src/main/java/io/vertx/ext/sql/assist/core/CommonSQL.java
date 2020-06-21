@@ -54,7 +54,7 @@ public abstract class CommonSQL<E, C> implements CommonSQLClient<C> {
 	/**
 	 * 获取客户端
 	 * 
-	 * @return
+	 * @return dbClient
 	 * 
 	 */
 	@Override
@@ -126,6 +126,12 @@ public abstract class CommonSQL<E, C> implements CommonSQLClient<C> {
 	public <T> Future<Integer> upsertAll(T obj) {
 		return command.upsertAll(obj);
 	}
+
+	@Override
+	public <T> Future<Integer> upsertAll(T obj, String dupCol) {
+		return command.upsertAll(obj,dupCol);
+	}
+
 	@Override
 	public <T> Future<Integer> insertNonEmpty(T obj) {
 		return command.insertNonEmpty(obj);
@@ -134,6 +140,11 @@ public abstract class CommonSQL<E, C> implements CommonSQLClient<C> {
 	@Override
 	public <T> Future<Integer> upsertNonEmpty(T obj) {
 		return command.upsertNonEmpty(obj);
+	}
+
+	@Override
+	public <T> Future<Integer> upsertNonEmpty(T obj, String dupCol) {
+		return command.upsertNonEmpty(obj,dupCol);
 	}
 
 	@Override

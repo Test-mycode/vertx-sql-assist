@@ -44,13 +44,6 @@ public interface SQLExecute<T> {
 	 * @return
 	 */
 	T getClient();
-
-	/*
-	*  添加日志
-	*
-	* */
-	void setLogger(Logger logger);
-
 	/**
 	 * 执行查询
 	 * 

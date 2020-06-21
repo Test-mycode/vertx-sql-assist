@@ -110,7 +110,7 @@ public abstract class AbstractStatementSQL implements SQLStatement {
 	 * 
 	 * @return
 	 */
-	public String getNameValue() {
+	public String getSqlPrimaryId() {
 		return sqlPrimaryId;
 	}
 
@@ -203,7 +203,7 @@ public abstract class AbstractStatementSQL implements SQLStatement {
 				}
 			}
 			if (assist.getGroupBy() != null) {
-				sql.append(" group by " + assist.getGroupBy() + " ");
+				sql.append(" group by ").append(assist.getGroupBy()).append(" ");
 			}
 		}
 		SqlAndParams result = new SqlAndParams(sql.toString(), params);
@@ -234,7 +234,7 @@ public abstract class AbstractStatementSQL implements SQLStatement {
 			if (assist.getCondition() != null && assist.getCondition().size() > 0) {
 				List<SqlWhereCondition<?>> where = assist.getCondition();
 				params = new JsonArray();
-				sql.append(" where " + where.get(0).getRequire());
+				sql.append(" where ").append(where.get(0).getRequire());
 				if (where.get(0).getValue() != null) {
 					params.add(where.get(0).getValue());
 				}
@@ -256,10 +256,10 @@ public abstract class AbstractStatementSQL implements SQLStatement {
 				}
 			}
 			if (assist.getGroupBy() != null) {
-				sql.append(" group by " + assist.getGroupBy() + " ");
+				sql.append(" group by ").append(assist.getGroupBy()).append(" ");
 			}
 			if (assist.getHaving() != null) {
-				sql.append(" having " + assist.getHaving() + " ");
+				sql.append(" having ").append(assist.getHaving()).append(" ");
 				if (assist.getHavingValue() != null) {
 					if (params == null) {
 						params = new JsonArray();
@@ -294,7 +294,7 @@ public abstract class AbstractStatementSQL implements SQLStatement {
 	@Override
 	public <S> SqlAndParams selectByIdSQL(S primaryValue, String resultColumns, String joinOrReference) {
 		String sql = String.format("select %s from %s %s where %s = ? ", (resultColumns == null ? getSqlResultColumns() : resultColumns),
-				getSqlTableName(), (joinOrReference == null ? "" : joinOrReference), getNameValue());
+				getSqlTableName(), (joinOrReference == null ? "" : joinOrReference), getSqlPrimaryId());
 		JsonArray params = new JsonArray();
 		params.add(primaryValue);
 		SqlAndParams result = new SqlAndParams(sql, params);
@@ -432,7 +432,7 @@ public abstract class AbstractStatementSQL implements SQLStatement {
 			}
 		}
 		String sql = String.format("replace into %s (%s) values (%s) ", getSqlTableName(), tempColumn, tempValues);
-		SqlAndParams result = new SqlAndParams(sql.toString(), params);
+		SqlAndParams result = new SqlAndParams(sql, params);
 		if (this.getLOG().isDebugEnabled()) {
 			this.getLOG().debug("replaceSQL : " + result.toString());
 		}
@@ -441,7 +441,7 @@ public abstract class AbstractStatementSQL implements SQLStatement {
 
 	@Override
 	public <T> SqlAndParams updateAllByIdSQL(T obj) {
-		if (getNameValue() == null) {
+		if (getSqlPrimaryId() == null) {
 			return new SqlAndParams(false, "there is no primary key in your SQL statement");
 		}
 		JsonArray params = new JsonArray();
@@ -454,7 +454,7 @@ public abstract class AbstractStatementSQL implements SQLStatement {
 			return new SqlAndParams(false, " Get SqlPropertyValue failed: " + e.getMessage());
 		}
 		for (SqlPropertyValue<?> pv : propertyValue) {
-			if (pv.getName().equals(getNameValue())) {
+			if (pv.getName().equals(getSqlPrimaryId())) {
 				tempIdValue = pv.getValue();
 				continue;
 			}
@@ -473,7 +473,7 @@ public abstract class AbstractStatementSQL implements SQLStatement {
 			return new SqlAndParams(false, "there is no primary key in your SQL statement");
 		}
 		params.add(tempIdValue);
-		String sql = String.format("update %s set %s where %s = ? ", getSqlTableName(), tempColumn, getNameValue());
+		String sql = String.format("update %s set %s where %s = ? ", getSqlTableName(), tempColumn, getSqlPrimaryId());
 		SqlAndParams result = new SqlAndParams(sql, params);
 		if (this.getLOG().isDebugEnabled()) {
 			this.getLOG().debug("updateAllByIdSQL : " + result.toString());
@@ -528,7 +528,7 @@ public abstract class AbstractStatementSQL implements SQLStatement {
 			}
 		}
 		String sql = String.format("update %s set %s %s", getSqlTableName(), tempColumn, whereStr);
-		SqlAndParams result = new SqlAndParams(sql.toString(), params);
+		SqlAndParams result = new SqlAndParams(sql, params);
 		if (this.getLOG().isDebugEnabled()) {
 			this.getLOG().debug("updateAllByAssistSQL : " + result.toString());
 		}
@@ -537,7 +537,7 @@ public abstract class AbstractStatementSQL implements SQLStatement {
 
 	@Override
 	public <T> SqlAndParams updateNonEmptyByIdSQL(T obj) {
-		if (getNameValue() == null) {
+		if (getSqlPrimaryId() == null) {
 			if (this.getLOG().isDebugEnabled()) {
 				this.getLOG().debug("there is no primary key in your SQL statement");
 			}
@@ -553,7 +553,7 @@ public abstract class AbstractStatementSQL implements SQLStatement {
 			return new SqlAndParams(false, " Get SqlPropertyValue failed: " + e.getMessage());
 		}
 		for (SqlPropertyValue<?> pv : propertyValue) {
-			if (pv.getName().equals(getNameValue())) {
+			if (pv.getName().equals(getSqlPrimaryId())) {
 				tempIdValue = pv.getValue();
 				continue;
 			}
@@ -574,7 +574,7 @@ public abstract class AbstractStatementSQL implements SQLStatement {
 			return new SqlAndParams(false, "there is no set update value or no primary key in your SQL statement");
 		}
 		params.add(tempIdValue);
-		String sql = String.format("update %s set %s where %s = ? ", getSqlTableName(), tempColumn, getNameValue());
+		String sql = String.format("update %s set %s where %s = ? ", getSqlTableName(), tempColumn, getSqlPrimaryId());
 		SqlAndParams result = new SqlAndParams(sql, params);
 		if (this.getLOG().isDebugEnabled()) {
 			this.getLOG().debug("updateNonEmptyByIdSQL : " + result.toString());
@@ -641,7 +641,7 @@ public abstract class AbstractStatementSQL implements SQLStatement {
 
 	@Override
 	public <S> SqlAndParams updateSetNullByIdSQL(S primaryValue, List<String> columns) {
-		if (getNameValue() == null) {
+		if (getSqlPrimaryId() == null) {
 			return new SqlAndParams(false, "there is no primary key in your SQL statement");
 		}
 
@@ -653,7 +653,7 @@ public abstract class AbstractStatementSQL implements SQLStatement {
 		for (int i = 1; i < columns.size(); i++) {
 			setStr.append(", ").append(columns.get(i)).append(" = null ");
 		}
-		String sql = String.format("update %s set %s where %s = ? ", getSqlTableName(), setStr.toString(), getNameValue());
+		String sql = String.format("update %s set %s where %s = ? ", getSqlTableName(), setStr.toString(), getSqlPrimaryId());
 		JsonArray params = new JsonArray();
 		params.add(primaryValue);
 		SqlAndParams result = new SqlAndParams(sql, params);
@@ -699,7 +699,7 @@ public abstract class AbstractStatementSQL implements SQLStatement {
 			}
 		}
 		String sql = String.format("update %s set %s %s", getSqlTableName(), setStr.toString(), whereStr);
-		SqlAndParams result = new SqlAndParams(sql.toString(), params);
+		SqlAndParams result = new SqlAndParams(sql, params);
 		if (this.getLOG().isDebugEnabled()) {
 			this.getLOG().debug("updateSetNullByAssist : " + result.toString());
 		}
@@ -708,10 +708,10 @@ public abstract class AbstractStatementSQL implements SQLStatement {
 
 	@Override
 	public <S> SqlAndParams deleteByIdSQL(S primaryValue) {
-		if (getNameValue() == null) {
+		if (getSqlPrimaryId() == null) {
 			return new SqlAndParams(false, "there is no primary key in your SQL statement");
 		}
-		String sql = String.format("delete from %s where %s = ? ", getSqlTableName(), getNameValue());
+		String sql = String.format("delete from %s where %s = ? ", getSqlTableName(), getSqlPrimaryId());
 		JsonArray params = new JsonArray();
 		params.add(primaryValue);
 		SqlAndParams result = new SqlAndParams(sql, params);
@@ -736,7 +736,7 @@ public abstract class AbstractStatementSQL implements SQLStatement {
 			for (Object value : where.get(0).getValues()) {
 				params.add(value);
 			}
-		} ;
+		}
 		for (int i = 1; i < where.size(); i++) {
 			whereStr.append(where.get(i).getRequire());
 			if (where.get(i).getValue() != null) {

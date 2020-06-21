@@ -18,7 +18,6 @@ import java.util.List;
  * @author <a href="http://szmirren.com">Mirren</a>
  */
 public class SQLExecutePostgresqlImpl implements SQLExecute<SQLOperations> {
-    private Logger logger;
     /**
      * SQL客户端
      */
@@ -32,11 +31,6 @@ public class SQLExecutePostgresqlImpl implements SQLExecute<SQLOperations> {
     @Override
     public SQLOperations getClient() {
         return client;
-    }
-
-    @Override
-    public void setLogger(Logger logger) {
-        this.logger = logger;
     }
 
     @Override
@@ -82,7 +76,6 @@ public class SQLExecutePostgresqlImpl implements SQLExecute<SQLOperations> {
      */
     public Future<ResultSet> queryExecute(SqlAndParams qp) {
         Promise<ResultSet> result = Promise.promise();
-        this.logSqlAndParam(qp.getSql(), qp.getParams());
         if (qp.getParams() == null) {
             client.query(qp.getSql(), result);
         } else {
@@ -98,18 +91,11 @@ public class SQLExecutePostgresqlImpl implements SQLExecute<SQLOperations> {
      */
     public Future<UpdateResult> updateExecute(SqlAndParams qp) {
         Promise<UpdateResult> result = Promise.promise();
-        this.logSqlAndParam(qp.getSql(), qp.getParams());
         if (qp.getParams() == null) {
             client.update(qp.getSql(), result);
         } else {
             client.updateWithParams(qp.getSql(), qp.getParams(), result);
         }
         return result.future();
-    }
-
-    private void logSqlAndParam(String sql, JsonArray params) {
-        if (logger == null) return;
-        logger.info(sql);
-        logger.info(params.toString());
     }
 }

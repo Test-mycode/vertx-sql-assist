@@ -37,7 +37,7 @@ public class MySQLStatementSQL extends AbstractStatementSQL {
 	}
 
 	@Override
-	public <T> SqlAndParams upsertAllSQL(T obj) {
+	public <T> SqlAndParams upsertAllSQL(T obj, String dupCol) {
 		JsonArray params = null;
 		StringBuilder tempColumn = null;
 		StringBuilder tempValues = null;
@@ -70,13 +70,13 @@ public class MySQLStatementSQL extends AbstractStatementSQL {
 
 		SqlAndParams result = new SqlAndParams(sql, new JsonArray().addAll(params).addAll(params));
 		if (this.getLOG().isDebugEnabled()) {
-			this.getLOG().debug("insertAllSQL : " + result.toString());
+			this.getLOG().debug("upsertAllSQL : " + result.toString());
 		}
 		return result;
 	}
 
 	@Override
-	public <T> SqlAndParams upsertNonEmptySQL(T obj) {
+	public <T> SqlAndParams upsertNonEmptySQL(T obj, String dupCol) {
 		JsonArray params = null;
 		StringBuilder tempColumn = null;
 		StringBuilder tempValues = null;
@@ -105,7 +105,7 @@ public class MySQLStatementSQL extends AbstractStatementSQL {
 		String sql = String.format("insert into %s (%s) values (%s) on duplicate key update %s", getSqlTableName(), tempColumn, tempValues,updateItems);
 		SqlAndParams result = new SqlAndParams(sql, new JsonArray().addAll(params).addAll(params));
 		if (this.getLOG().isDebugEnabled()) {
-			this.getLOG().debug("insertNonEmptySQL : " + result.toString());
+			this.getLOG().debug("upsertNonEmptySQL : " + result.toString());
 		}
 		return result;
 	}

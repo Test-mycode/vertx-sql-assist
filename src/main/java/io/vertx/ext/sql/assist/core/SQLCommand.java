@@ -227,6 +227,19 @@ public interface SQLCommand {
 	 */
 	<T> Future<Integer> upsertAll(T obj);
 
+
+	/**
+	 * 插入一个对象包括属性值为null的值
+	 *
+	 * @param obj
+	 *          对象
+	 * @param dupCol
+	 * 			冲突列
+	 * @return future
+	 *          返回操作结果
+	 */
+	<T> Future<Integer> upsertAll(T obj,String dupCol);
+
 	/**
 	 * 插入一个对象,只插入对象中值不为null的属性
 	 *
@@ -248,6 +261,20 @@ public interface SQLCommand {
 	 *          返回操作结果
 	 */
 	<T> Future<Integer> upsertNonEmpty(T obj);
+
+
+
+	/**
+	 * 插入一个对象,只插入对象中值不为null的属性
+	 *
+	 * @param obj
+	 *          对象
+	 * @param dupCol
+	 * 			冲突列
+	 * @return future
+	 *          返回操作结果
+	 */
+	<T> Future<Integer> upsertNonEmpty(T obj,String dupCol);
 
 
 	/**

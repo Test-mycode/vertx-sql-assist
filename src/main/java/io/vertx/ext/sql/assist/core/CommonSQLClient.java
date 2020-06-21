@@ -18,7 +18,7 @@ public interface CommonSQLClient<C> {
 	/**
 	 * 获取客户端
 	 * 
-	 * @return
+	 * @return dbClient
 	 */
 	C getDbClient();
 
@@ -153,6 +153,9 @@ public interface CommonSQLClient<C> {
 
 	<T> Future<Integer> upsertAll(T obj);
 
+
+	<T> Future<Integer> upsertAll(T obj,String dupCol);
+
 	/**
 	 * 插入一个对象,只插入对象中值不为null的属性
 	 * 
@@ -165,6 +168,9 @@ public interface CommonSQLClient<C> {
 
 
 	<T> Future<Integer> upsertNonEmpty(T obj);
+
+
+	<T> Future<Integer> upsertNonEmpty(T obj,String dupCol);
 
 	/**
 	 * 插入一个对象,只插入对象中值不为null的属性

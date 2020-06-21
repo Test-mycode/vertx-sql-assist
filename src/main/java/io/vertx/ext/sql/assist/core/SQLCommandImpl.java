@@ -83,11 +83,17 @@ public class SQLCommandImpl implements SQLCommand {
 
 	@Override
 	public <T> Future<Integer> upsertAll(T obj) {
-		SqlAndParams qp = statement.upsertAllSQL(obj);
+		SqlAndParams qp = statement.upsertAllSQL(obj,null);
 		return execute.update(qp);
 	}
 
-	@Override
+    @Override
+    public <T> Future<Integer> upsertAll(T obj, String dupCol) {
+        SqlAndParams qp = statement.upsertAllSQL(obj,dupCol);
+        return execute.update(qp);
+    }
+
+    @Override
     public <T> Future<Integer> insertNonEmpty(T obj) {
         SqlAndParams qp = statement.insertNonEmptySQL(obj);
         return execute.update(qp);
@@ -95,11 +101,17 @@ public class SQLCommandImpl implements SQLCommand {
 
 	@Override
 	public <T> Future<Integer> upsertNonEmpty(T obj) {
-		SqlAndParams qp = statement.upsertNonEmptySQL(obj);
+		SqlAndParams qp = statement.upsertNonEmptySQL(obj, null);
 		return execute.update(qp);
 	}
 
-	@Override
+    @Override
+    public <T> Future<Integer> upsertNonEmpty(T obj, String dupCol) {
+        SqlAndParams qp = statement.upsertNonEmptySQL(obj,dupCol);
+        return execute.update(qp);
+    }
+
+    @Override
     public <T> Future<JsonArray> insertNonEmptyReturnId(T obj) {
         SqlAndParams qp = statement.insertNonEmptySQLReturnId(obj);
         return execute.insert(qp);

@@ -140,9 +140,10 @@ public interface SQLStatement {
 	 * 插入一个对象包括属性值为null的值<br>
 	 *
 	 * @param obj
-	 * @return 返回:sql 或者 sql与params
+	 * @param dupCol
+     * @return 返回:sql 或者 sql与params
 	 */
-	<T> SqlAndParams upsertAllSQL(T obj);
+	<T> SqlAndParams upsertAllSQL(T obj, String dupCol);
 
 
 	/**
@@ -160,9 +161,10 @@ public interface SQLStatement {
 	 *
 	 * @param obj
 	 *          对象
+	 * @param dupCol
 	 * @return 返回:sql 或 sql与params
 	 */
-	<T> SqlAndParams upsertNonEmptySQL(T obj);
+	<T> SqlAndParams upsertNonEmptySQL(T obj, String dupCol);
 
 
 	/**

@@ -56,7 +56,7 @@ public class SqlAssist {
 	/**
 	 * 将当前对象装换为json字符串
 	 * 
-	 * @return
+	 * @return jsonStr
 	 */
 	public String toJsonStr() {
 		return toJson().toString();
@@ -65,7 +65,7 @@ public class SqlAssist {
 	/**
 	 * 将当前对象装换为JsonObject
 	 * 
-	 * @return
+	 * @return jsonObj
 	 */
 	public JsonObject toJson() {
 		JsonObject json = new JsonObject();

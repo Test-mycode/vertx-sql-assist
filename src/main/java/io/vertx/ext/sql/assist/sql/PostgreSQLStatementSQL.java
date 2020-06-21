@@ -32,7 +32,9 @@ public class PostgreSQLStatementSQL extends AbstractStatementSQL {
 	}
 
 	@Override
-	public <T> SqlAndParams upsertAllSQL(T obj) {
+	public <T> SqlAndParams upsertAllSQL(T obj, String dupCol) {
+		if(dupCol==null||dupCol.trim().equals(""))
+			dupCol = this.getSqlPrimaryId();
 		JsonArray params = null;
 		StringBuilder tempColumn = null;
 		StringBuilder tempValues = null;
@@ -61,16 +63,19 @@ public class PostgreSQLStatementSQL extends AbstractStatementSQL {
 			}
 		}
 		String sql = String.format("insert into %s (%s) values (%s) ON CONFLICT(%s) do update set %s",
-				getSqlTableName(), tempColumn, tempValues, getNameValue(),updateItems);
+				getSqlTableName(), tempColumn, tempValues, dupCol,updateItems);
 		SqlAndParams result = new SqlAndParams(sql, params);
 		if (LOG.isDebugEnabled()) {
-			LOG.debug("insertAllSQL : " + result.toString());
+			LOG.debug("upsertAllSQL : " + result.toString());
 		}
 		return result;
 	}
 
 	@Override
-	public <T> SqlAndParams upsertNonEmptySQL(T obj) {
+	public <T> SqlAndParams upsertNonEmptySQL(T obj, String dupCol) {
+		if(dupCol==null||dupCol.trim().equals(""))
+			dupCol = this.getSqlPrimaryId();
+
 		JsonArray params = null;
 		StringBuilder tempColumn = null;
 		StringBuilder tempValues = null;
@@ -96,10 +101,10 @@ public class PostgreSQLStatementSQL extends AbstractStatementSQL {
 				params.add(pv.getValue());
 			}
 		}
-		String sql = String.format("insert into %s (%s) values (%s) ON CONFLICT(%s) do update set %s", getSqlTableName(), tempColumn, tempValues, getNameValue(),updateItems);
+		String sql = String.format("insert into %s (%s) values (%s) ON CONFLICT(%s) do update set %s", getSqlTableName(), tempColumn, tempValues,dupCol,updateItems);
 		SqlAndParams result = new SqlAndParams(sql, params);
 		if (this.getLOG().isDebugEnabled()) {
-			this.getLOG().debug("insertNonEmptySQL : " + result.toString());
+			this.getLOG().debug("upsertNonEmptySQL : " + result.toString());
 		}
 		return result;
 	}
@@ -128,10 +133,10 @@ public class PostgreSQLStatementSQL extends AbstractStatementSQL {
 				params.add(pv.getValue());
 			}
 		}
-		String sql = String.format("insert into %s (%s) values (%s) returning %s", getSqlTableName(), tempColumn, tempValues, getNameValue());
+		String sql = String.format("insert into %s (%s) values (%s) returning %s", getSqlTableName(), tempColumn, tempValues, getSqlPrimaryId());
 		SqlAndParams result = new SqlAndParams(sql, params);
 		if (this.getLOG().isDebugEnabled()) {
-			this.getLOG().debug("insertNonEmptySQL : " + result.toString());
+			this.getLOG().debug("insertNonEmptySQLReturnId : " + result.toString());
 		}
 		return result;
 	}

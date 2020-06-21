@@ -76,7 +76,8 @@ public class SqlWhereCondition<T> {
 		this.value = value;
 	}
 
-	public SqlWhereCondition(String require, Object... values) {
+	@SafeVarargs
+	public SqlWhereCondition(String require, T... values) {
 		super();
 		this.require = require;
 		this.values = values;
