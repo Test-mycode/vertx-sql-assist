@@ -177,14 +177,6 @@ public interface SQLStatement {
 	<T> SqlAndParams insertNonEmptySQLReturnId(T obj);
 
 	/**
-	 * 插入一个对象,如果该对象不存在就新建如果该对象已经存在就更新
-	 * 
-	 * @param obj
-	 *          对象
-	 * @return 返回:sql 或 sql与params
-	 */
-	<T> SqlAndParams replaceSQL(T obj);
-	/**
 	 * 更新一个对象中所有的属性包括null值,条件为对象中的主键值
 	 * 
 	 * @param obj

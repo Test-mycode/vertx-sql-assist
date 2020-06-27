@@ -408,38 +408,6 @@ public abstract class AbstractStatementSQL implements SQLStatement {
 	}
 
 	@Override
-	public <T> SqlAndParams replaceSQL(T obj) {
-		JsonArray params = null;
-		StringBuilder tempColumn = null;
-		StringBuilder tempValues = null;
-		List<SqlPropertyValue<?>> propertyValue;
-		try {
-			propertyValue = getPropertyValue(obj);
-		} catch (Exception e) {
-			return new SqlAndParams(false, " Get SqlPropertyValue failed: " + e.getMessage());
-		}
-		for (SqlPropertyValue<?> pv : propertyValue) {
-			if (pv.getValue() != null) {
-				if (tempColumn == null) {
-					tempColumn = new StringBuilder(pv.getName());
-					tempValues = new StringBuilder("?");
-					params = new JsonArray();
-				} else {
-					tempColumn.append(",").append(pv.getName());
-					tempValues.append(",?");
-				}
-				params.add(pv.getValue());
-			}
-		}
-		String sql = String.format("replace into %s (%s) values (%s) ", getSqlTableName(), tempColumn, tempValues);
-		SqlAndParams result = new SqlAndParams(sql, params);
-		if (this.getLOG().isDebugEnabled()) {
-			this.getLOG().debug("replaceSQL : " + result.toString());
-		}
-		return result;
-	}
-
-	@Override
 	public <T> SqlAndParams updateAllByIdSQL(T obj) {
 		if (getSqlPrimaryId() == null) {
 			return new SqlAndParams(false, "there is no primary key in your SQL statement");
