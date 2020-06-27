@@ -61,7 +61,7 @@ public interface SQLCommand {
 	 */
 	Future<List<JsonObject>> selectAll(SqlAssist assist);
 
-	default Future<JsonObject> limitAll(final SqlAssist assist) {
+	default Future<SqlLimitResult<JsonObject>> limitAll(final SqlAssist assist) {
 		if (assist == null) {
 			return Future.failedFuture("The SqlAssist cannot be null , you can pass in new SqlAssist()");
 		}
@@ -80,11 +80,10 @@ public interface SQLCommand {
 				.compose(count -> {
 					SqlLimitResult<JsonObject> result = new SqlLimitResult<>(count, assist.getPage(), assist.getRowSize());
 					if (count == 0 || assist.getPage() > result.getPages()) {
-						return Future.succeededFuture(result.toJson());
+						return Future.succeededFuture(result);
 					} else {
 						return this.selectAll(assist)
-								.map(result::setData)
-								.map(SqlLimitResult::toJson);
+								.map(result::setData);
 					}
 				});
 

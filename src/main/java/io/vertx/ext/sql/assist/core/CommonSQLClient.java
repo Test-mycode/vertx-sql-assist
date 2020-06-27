@@ -68,7 +68,7 @@ public interface CommonSQLClient<C> {
 	 * @return future
 	 *          返回结果为(JsonObject)格式为: {@link SqlLimitResult#toJson()}
 	 */
-	Future<JsonObject> limitAll(final SqlAssist assist);
+	Future<SqlLimitResult<JsonObject>> limitAll(final SqlAssist assist);
 
 	/**
 	 * 通过ID查询出数据
@@ -151,9 +151,27 @@ public interface CommonSQLClient<C> {
 	<T> Future<Integer> insertAll(T obj);
 
 
+	/**
+	 * 插入一个对象,如果该对象不存在就新建如果该对象已经存在就更新
+	 *
+	 * @param obj
+	 *          对象
+	 *
+	 * @return future
+	 *          结果集受影响的行数
+	 */
 	<T> Future<Integer> upsertAll(T obj);
 
 
+	/**
+	 * 插入一个对象,如果该对象不存在就新建如果该对象已经存在就更新
+	 *
+	 * @param obj
+	 *          对象
+	 *
+	 * @return future
+	 *          结果集受影响的行数
+	 */
 	<T> Future<Integer> upsertAll(T obj,String dupCol);
 
 	/**
@@ -167,9 +185,27 @@ public interface CommonSQLClient<C> {
 	<T> Future<Integer> insertNonEmpty(T obj);
 
 
+	/**
+	 * 插入一个对象,如果该对象不存在就新建如果该对象已经存在就更新
+	 *
+	 * @param obj
+	 *          对象
+	 *
+	 * @return future
+	 *          结果集受影响的行数
+	 */
 	<T> Future<Integer> upsertNonEmpty(T obj);
 
 
+	/**
+	 * 插入一个对象,如果该对象不存在就新建如果该对象已经存在就更新
+	 *
+	 * @param obj
+	 *          对象
+	 *
+	 * @return future
+	 *          结果集受影响的行数
+	 */
 	<T> Future<Integer> upsertNonEmpty(T obj,String dupCol);
 
 	/**
@@ -181,17 +217,6 @@ public interface CommonSQLClient<C> {
 	 *          返回操作结果
 	 */
 	<T> Future<JsonArray> insertNonEmptyReturnId(T obj);
-
-	/**
-	 * 插入一个对象,如果该对象不存在就新建如果该对象已经存在就更新
-	 * 
-	 * @param obj
-	 *          对象
-	 * 
-	 * @return future
-	 *          结果集受影响的行数
-	 */
-	<T> Future<Integer> replace(T obj);
 
 	/**
 	 * 更新一个对象中所有的属性包括null值,条件为对象中的主键值

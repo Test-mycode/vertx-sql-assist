@@ -83,7 +83,7 @@ public abstract class CommonSQL<E, C> implements CommonSQLClient<C> {
 	}
 
 	@Override
-	public Future<JsonObject> limitAll(SqlAssist assist) {
+	public Future<SqlLimitResult<JsonObject>> limitAll(SqlAssist assist) {
 		return command.limitAll(assist);
 	}
 
@@ -150,11 +150,6 @@ public abstract class CommonSQL<E, C> implements CommonSQLClient<C> {
 	@Override
 	public <T> Future<JsonArray> insertNonEmptyReturnId(T obj) {
 		return command.insertNonEmptyReturnId(obj);
-	}
-
-	@Override
-	public <T> Future<Integer> replace(T obj) {
-		return command.replace(obj);
 	}
 
 	@Override
