@@ -8,7 +8,7 @@ import io.vertx.core.json.JsonObject;
 
 /**
  * SQL查询帮助类
- * 
+ *
  * @author <a href="https://mirrentools.org">Mirren</a>
  *
  */
@@ -44,7 +44,7 @@ public class SqlAssist {
 
 	/**
 	 * 该构造方法用于使用SqlAssist的静态条件方法,动态添加条件
-	 * 
+	 *
 	 * @param require
 	 *          示例:查询等于使用 SqlWhereCondition.andEq("A.ID",10)...
 	 *          {@link SqlWhereCondition#andEq(String, Object)}
@@ -55,7 +55,7 @@ public class SqlAssist {
 
 	/**
 	 * 将当前对象装换为json字符串
-	 * 
+	 *
 	 * @return jsonStr
 	 */
 	public String toJsonStr() {
@@ -64,7 +64,7 @@ public class SqlAssist {
 
 	/**
 	 * 将当前对象装换为JsonObject
-	 * 
+	 *
 	 * @return jsonObj
 	 */
 	public JsonObject toJson() {
@@ -114,7 +114,7 @@ public class SqlAssist {
 
 	/**
 	 * 将JsonObject对象装换为SqlAssist
-	 * 
+	 *
 	 * @param obj
 	 * @return
 	 */
@@ -145,7 +145,7 @@ public class SqlAssist {
 
 	/**
 	 * 添加单个查询条件,参数为{@link SqlWhereCondition} ,推荐使用SqlWhereCondition的静态条件方法添加条件;
-	 * 
+	 *
 	 * @param require
 	 *          示例:查询等于使用 SqlWhereCondition.andEq("A.ID",10)...
 	 *          {@link SqlWhereCondition#andEq(String, Object)}
@@ -166,7 +166,7 @@ public class SqlAssist {
 
 	/**
 	 * 添加多个查询条件,参数为{@ SqlWhereCondition},推荐使用SqlWhereCondition的静态条件方法添加条件;
-	 * 
+	 *
 	 * @param require
 	 *          示例:查询等于使用 SqlWhereCondition.andEq("A.ID",10)...
 	 *          {@link SqlWhereCondition#andEq(String, Object)}
@@ -191,7 +191,7 @@ public class SqlAssist {
 
 	/**
 	 * 添加查询条件,该方法一般用于初始化,因为会将现有的条件集清空,既this.condition=conditions
-	 * 
+	 *
 	 * @param conditions
 	 * @return
 	 */
@@ -204,7 +204,7 @@ public class SqlAssist {
 	 * 添加并且条件,列名与表达式<br>
 	 * 示例: column = id IS NULL<br>
 	 * SQL: [and] id IS NULL
-	 * 
+	 *
 	 * @param column
 	 *          列名:如果表中存在相同列名使用表名.列名
 	 * @return
@@ -218,7 +218,7 @@ public class SqlAssist {
 	 * 添加或者条件,列名与表达式<br>
 	 * 示例: column = id IS NULL<br>
 	 * SQL: [or] id IS NULL
-	 * 
+	 *
 	 * @param column
 	 *          列名:如果表中存在相同列名使用表名.列名
 	 * @return
@@ -232,7 +232,7 @@ public class SqlAssist {
 	 * 添加并且条件,列名与表达式<br>
 	 * 示例: column = id<br>
 	 * SQL: [and] id IS NULL
-	 * 
+	 *
 	 * @param column
 	 *          列名:如果表中存在相同列名使用表名.列名
 	 * @return
@@ -246,7 +246,7 @@ public class SqlAssist {
 	 * 添加或者条件,列名与表达式<br>
 	 * 示例: column = id<br>
 	 * SQL: [or] id IS NULL
-	 * 
+	 *
 	 * @param column
 	 *          列名:如果表中存在相同列名使用表名.列名
 	 * @return
@@ -260,7 +260,7 @@ public class SqlAssist {
 	 * 添加并且条件,列名与表达式<br>
 	 * 示例: column = id<br>
 	 * SQL: [and] id IS NOT NULL
-	 * 
+	 *
 	 * @param column
 	 *          列名:如果表中存在相同列名使用表名.列名
 	 * @return
@@ -274,7 +274,7 @@ public class SqlAssist {
 	 * 添加或者条件,列名与表达式<br>
 	 * 示例: column = id<br>
 	 * SQL: [or] id IS NOT NULL
-	 * 
+	 *
 	 * @param column
 	 *          列名:如果表中存在相同列名使用表名.列名
 	 * @return
@@ -288,7 +288,7 @@ public class SqlAssist {
 	 * 添加并且等于条件<br>
 	 * 示例: column = id ,value =1<br>
 	 * SQL: [and] id = 1
-	 * 
+	 *
 	 * @param column
 	 *          列名:如果表中存在相同列名使用表名.列名
 	 * @param value
@@ -304,7 +304,7 @@ public class SqlAssist {
 	 * 添加或者等于条件<br>
 	 * 示例: column = id ,value =1<br>
 	 * SQL: [or] id = 1
-	 * 
+	 *
 	 * @param column
 	 *          列名:如果表中存在相同列名使用表名.列名
 	 * @param value
@@ -386,7 +386,7 @@ public class SqlAssist {
 	 * 添加并且不等于条件<br>
 	 * 示例: column = id ,value =1<br>
 	 * SQL: [and] id <> 1
-	 * 
+	 *
 	 * @param column
 	 *          列名:如果表中存在相同列名使用表名.列名
 	 * @param value
@@ -402,7 +402,7 @@ public class SqlAssist {
 	 * 添加或者不等于条件<br>
 	 * 示例: column = id ,value =1<br>
 	 * SQL: [or] id <> 1
-	 * 
+	 *
 	 * @param column
 	 *          列名:如果表中存在相同列名使用表名.列名
 	 * @param value
@@ -418,7 +418,7 @@ public class SqlAssist {
 	 * 添加并且小于条件<br>
 	 * 示例: column = id ,value =1<br>
 	 * SQL: [and] id < 1
-	 * 
+	 *
 	 * @param column
 	 *          列名:如果表中存在相同列名使用表名.列名
 	 * @param value
@@ -434,7 +434,7 @@ public class SqlAssist {
 	 * 添加或者小于条件<br>
 	 * 示例: column = id ,value =1<br>
 	 * SQL: [or] id < 1
-	 * 
+	 *
 	 * @param column
 	 *          列名:如果表中存在相同列名使用表名.列名
 	 * @param value
@@ -450,7 +450,7 @@ public class SqlAssist {
 	 * 添加并且小于等于条件<br>
 	 * 示例: column = id ,value =1<br>
 	 * SQL: [and] id <= 1
-	 * 
+	 *
 	 * @param column
 	 *          列名:如果表中存在相同列名使用表名.列名
 	 * @param value
@@ -466,7 +466,7 @@ public class SqlAssist {
 	 * 添加或者小于等于条件<br>
 	 * 示例: column = id ,value =1<br>
 	 * SQL: [or] id <= 1
-	 * 
+	 *
 	 * @param column
 	 *          列名:如果表中存在相同列名使用表名.列名
 	 * @param value
@@ -482,7 +482,7 @@ public class SqlAssist {
 	 * 添加并且大于条件<br>
 	 * 示例: column = id ,value =1<br>
 	 * SQL: [and] id > 1
-	 * 
+	 *
 	 * @param column
 	 *          列名:如果表中存在相同列名使用表名.列名
 	 * @param value
@@ -498,7 +498,7 @@ public class SqlAssist {
 	 * 添加或者大于条件<br>
 	 * 示例: column = id ,value =1<br>
 	 * SQL: [or] id > 1
-	 * 
+	 *
 	 * @param column
 	 *          列名:如果表中存在相同列名使用表名.列名
 	 * @param value
@@ -514,7 +514,7 @@ public class SqlAssist {
 	 * 添加并且大于等于条件<br>
 	 * 示例: column = id ,value =1<br>
 	 * SQL: [and] id >= 1
-	 * 
+	 *
 	 * @param column
 	 *          列名:如果表中存在相同列名使用表名.列名
 	 * @param value
@@ -530,7 +530,7 @@ public class SqlAssist {
 	 * 添加或者大于等于条件<br>
 	 * 示例: column = id ,value =1<br>
 	 * SQL: [or] id >= 1
-	 * 
+	 *
 	 * @param column
 	 *          列名:如果表中存在相同列名使用表名.列名
 	 * @param value
@@ -546,7 +546,7 @@ public class SqlAssist {
 	 * 添加并且like条件<br>
 	 * 示例: column = id ,value =%1%<br>
 	 * SQL: [and] id like %1%
-	 * 
+	 *
 	 * @param column
 	 *          列名:如果表中存在相同列名使用表名.列名
 	 * @param value
@@ -562,7 +562,7 @@ public class SqlAssist {
 	 * 添加或者like条件<br>
 	 * 示例: column = id ,value =%1%<br>
 	 * SQL: [or] id like %1%
-	 * 
+	 *
 	 * @param column
 	 *          列名:如果表中存在相同列名使用表名.列名
 	 * @param value
@@ -578,7 +578,7 @@ public class SqlAssist {
 	 * 添加并且like条件<br>
 	 * 示例: column = id ,value =%1%<br>
 	 * SQL: [and] id not like %1%
-	 * 
+	 *
 	 * @param column
 	 *          列名:如果表中存在相同列名使用表名.列名
 	 * @param value
@@ -594,7 +594,7 @@ public class SqlAssist {
 	 * 添加或者like条件<br>
 	 * 示例: column = id ,value =%1%<br>
 	 * SQL: [or] id not like %1%
-	 * 
+	 *
 	 * @param column
 	 *          列名:如果表中存在相同列名使用表名.列名
 	 * @param value
@@ -610,7 +610,7 @@ public class SqlAssist {
 	 * 添加自定义查询条件 :<br>
 	 * 示例: prefix= and id in(select tid from table where w=?) , value=1<br>
 	 * SQL: and id in(select tid from table where w=1)
-	 * 
+	 *
 	 * @param prefix
 	 *          SQL语句
 	 * @param value
@@ -618,7 +618,7 @@ public class SqlAssist {
 	 * @return
 	 */
 	public <T> SqlAssist customCondition(String prefix, T value) {
-		this.setConditions(SqlWhereCondition.customCondition(prefix, value));
+		this.setConditions(SqlWhereCondition.customCondition(prefix+" ", value));
 		return this;
 	}
 
@@ -626,7 +626,7 @@ public class SqlAssist {
 	 * 自定义查询条件 :<br>
 	 * 示例 :prefix=and id in(?,?,?),value=1,2,3<br>
 	 * SQL: and id in(1,2,3)
-	 * 
+	 *
 	 * @param prefix
 	 *          SQL语句
 	 * @param value
@@ -634,14 +634,14 @@ public class SqlAssist {
 	 * @return
 	 */
 	public SqlAssist customCondition(String prefix, Object... value) {
-		this.setConditions(SqlWhereCondition.customCondition(prefix, value));
+		this.setConditions(SqlWhereCondition.customCondition(prefix+" ", value));
 		return this;
 	}
 
 	/**
 	 * 获得一个排序对象,将(列名)参数1 按 参数2排序(true=ASC/false=DESC)<br>
 	 * ;如果表中存在相同列名使用表名.列名,如果不存在相同列名可以直接列名<br>
-	 * 
+	 *
 	 * @param column
 	 *          列名
 	 * @param mode
@@ -659,7 +659,7 @@ public class SqlAssist {
 	/**
 	 * 设置排序,通过SqlAssist.order(列名,排序方式)<br>
 	 * 示例:assist.setOrder(SqlAssist.order("id",true))//将id正序排序
-	 * 
+	 *
 	 * @param order
 	 *          {@link #order(String column, boolean mode)}
 	 * @return
@@ -682,7 +682,7 @@ public class SqlAssist {
 
 	/**
 	 * 设置一个编辑好的order,该方法一般用于初始化,因为会将现有的order清除,既order=参数order
-	 * 
+	 *
 	 * @param order
 	 * @return
 	 */
@@ -693,7 +693,7 @@ public class SqlAssist {
 
 	/**
 	 * 获得排序
-	 * 
+	 *
 	 * @return
 	 */
 	public String getOrder() {
@@ -702,7 +702,7 @@ public class SqlAssist {
 
 	/**
 	 * 获取分组
-	 * 
+	 *
 	 * @return
 	 */
 	public String getGroupBy() {
@@ -712,7 +712,7 @@ public class SqlAssist {
 	/**
 	 * 设置分组 示例传入: id,type<br>
 	 * SQL: GROUP BY id,type
-	 * 
+	 *
 	 * @param groupBy
 	 *          要分组的列名比如id,type
 	 * @return
@@ -724,7 +724,7 @@ public class SqlAssist {
 
 	/**
 	 * 获取分组条件
-	 * 
+	 *
 	 * @return
 	 */
 	public String getHaving() {
@@ -735,7 +735,7 @@ public class SqlAssist {
 	 * 设置分组条件<br>
 	 * 示例: having= id > ? and type=? values=[1,2]<br>
 	 * SQL: having id>1 and type=2
-	 * 
+	 *
 	 * @param having
 	 *          表达式,值以?号占位,示例: id > ? and type=?
 	 * @param values
@@ -750,7 +750,7 @@ public class SqlAssist {
 
 	/**
 	 * 获取Having的值
-	 * 
+	 *
 	 * @return
 	 */
 	public JsonArray getHavingValue() {
@@ -759,7 +759,7 @@ public class SqlAssist {
 
 	/**
 	 * 获得是否去重
-	 * 
+	 *
 	 * @return
 	 */
 	public String getDistinct() {
@@ -768,7 +768,7 @@ public class SqlAssist {
 
 	/**
 	 * 设置是否去重,true去重,false无效
-	 * 
+	 *
 	 * @param distinct
 	 */
 	public SqlAssist setDistincts(boolean distinct) {
@@ -781,7 +781,7 @@ public class SqlAssist {
 
 	/**
 	 * 设置一个现有的去除方案,该方法一般用于初始化,因为会将现有的distinct清除,既distinct=传入的distinct
-	 * 
+	 *
 	 * @param distinct
 	 * @return
 	 */
@@ -792,7 +792,7 @@ public class SqlAssist {
 
 	/**
 	 * 获得开始分页行
-	 * 
+	 *
 	 * @return
 	 */
 	public Integer getStartRow() {
@@ -801,7 +801,7 @@ public class SqlAssist {
 
 	/**
 	 * 获取第几页
-	 * 
+	 *
 	 * @return
 	 */
 	public Integer getPage() {
@@ -810,7 +810,7 @@ public class SqlAssist {
 
 	/**
 	 * 设置第几页,该值仅在limitAll方法中有效,最终会被转换为startRow
-	 * 
+	 *
 	 * @param page
 	 * @return
 	 */
@@ -821,7 +821,7 @@ public class SqlAssist {
 
 	/**
 	 * 设置从第几行开始取数据
-	 * 
+	 *
 	 * @param startRow
 	 */
 	public SqlAssist setStartRow(Integer startRow) {
@@ -831,7 +831,7 @@ public class SqlAssist {
 
 	/**
 	 * 获得每次取多少行数据
-	 * 
+	 *
 	 * @return
 	 */
 	public Integer getRowSize() {
@@ -840,7 +840,7 @@ public class SqlAssist {
 
 	/**
 	 * 设置每次取多少行数据
-	 * 
+	 *
 	 * @param rowSize
 	 */
 	public SqlAssist setRowSize(Integer rowSize) {
@@ -850,7 +850,7 @@ public class SqlAssist {
 
 	/**
 	 * 获得返回指定列
-	 * 
+	 *
 	 * @return
 	 */
 	public String getResultColumn() {
@@ -859,7 +859,7 @@ public class SqlAssist {
 
 	/**
 	 * 设置自定义返回列,多个列以,逗号隔开
-	 * 
+	 *
 	 * @return
 	 */
 	public SqlAssist setResultColumn(String resultColumn) {
@@ -869,7 +869,7 @@ public class SqlAssist {
 
 	/**
 	 * 获取连接查询或多表查询语句
-	 * 
+	 *
 	 * @return
 	 */
 	public String getJoinOrReference() {
@@ -880,7 +880,7 @@ public class SqlAssist {
 	 * 设置连接查询或多表查询语句<br>
 	 * 多表示例: ,table2,table3<br>
 	 * 连接示例: inner join table2 on table1.id=table2.id
-	 * 
+	 *
 	 * @param joinOrReference
 	 *          连接语句
 	 * @return
@@ -892,7 +892,7 @@ public class SqlAssist {
 
 	/**
 	 * 获得条件集
-	 * 
+	 *
 	 * @return
 	 */
 	public List<SqlWhereCondition<?>> getCondition() {
@@ -901,7 +901,7 @@ public class SqlAssist {
 
 	/**
 	 * 获得自定义属性
-	 * 
+	 *
 	 * @return
 	 */
 	public Object getCustom() {
@@ -910,7 +910,7 @@ public class SqlAssist {
 
 	/**
 	 * 设置自定义属性
-	 * 
+	 *
 	 * @param custom
 	 */
 	public void setCustom(Object custom) {

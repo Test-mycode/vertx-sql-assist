@@ -8,23 +8,14 @@ import io.vertx.core.json.JsonObject;
 
 /**
  * SQL可执行命令
- * 
+ *
  * @author <a href="http://szmirren.com">Mirren</a>
  *
  */
 public interface SQLCommand {
 	/**
-	 * 分页查询,默认page=1,rowSize=15(取第一页,每页取15行数据)
-	 *
-	 * @param assist
-	 *          查询工具(注意:startRow在该方法中无效,最后会有page转换为startRow)
-	 * @return future
-	 *          返回结果为(JsonObject)格式为: {@link SqlLimitResult#toJson()}
-	 */
-
-	/**
 	 * 获得数据总行数
-	 * 
+	 *
 	 * @return future
 	 *          返回数据总行数
 	 */
@@ -43,7 +34,7 @@ public interface SQLCommand {
 	Future<Long> getCount(SqlAssist assist);
 	/**
 	 * 查询所有数据
-	 * 
+	 *
 	 * @return future
 	 *          结果集
 	 */
@@ -87,7 +78,7 @@ public interface SQLCommand {
 					}
 				});
 
-	};
+	}
 
 	/**
 	 * 通过ID查询出数据
@@ -116,7 +107,7 @@ public interface SQLCommand {
 	}
 	/**
 	 * 通过ID查询出数据,并自定义返回列
-	 * 
+	 *
 	 * @param primaryValue
 	 *          主键值
 	 * @param resultColumns
@@ -127,10 +118,10 @@ public interface SQLCommand {
 	<S> Future<JsonObject> selectById(S primaryValue, String resultColumns, String joinOrReference);
 	/**
 	 * 将对象属性不为null的属性作为条件查询出数据,只取查询出来的第一条数据;
-	 * 
+	 *
 	 * @param obj
 	 *          对象
-	 * 
+	 *
 	 * @return future
 	 *          结果:如果存在返回JsonObject,不存在返回null
 	 */
@@ -139,12 +130,12 @@ public interface SQLCommand {
 	}
 	/**
 	 * 将对象属性不为null的属性作为条件查询出数据,只取查询出来的第一条数据
-	 * 
+	 *
 	 * @param obj
 	 *          对象
 	 * @param resultColumns
 	 *          自定义返回列
-	 * 
+	 *
 	 * @return future
 	 *          结果:如果存在返回JsonObject,不存在返回null
 	 */
@@ -153,7 +144,7 @@ public interface SQLCommand {
 	}
 	/**
 	 * 将对象属性不为null的属性作为条件查询出数据,只取查询出来的第一条数据
-	 * 
+	 *
 	 * @param obj
 	 *          对象
 	 * @param resultColumns
@@ -166,10 +157,10 @@ public interface SQLCommand {
 	<T> Future<JsonObject> selectSingleByObj(T obj, String resultColumns, String joinOrReference);
 	/**
 	 * 将对象属性不为null的属性作为条件查询出数据
-	 * 
+	 *
 	 * @param obj
 	 *          对象
-	 * 
+	 *
 	 * @return future
 	 *          返回结果集
 	 */
@@ -178,12 +169,12 @@ public interface SQLCommand {
 	}
 	/**
 	 * 将对象属性不为null的属性作为条件查询出数据
-	 * 
+	 *
 	 * @param obj
 	 *          对象
 	 * @param resultColumns
 	 *          自定义返回列
-	 * 
+	 *
 	 * @return future
 	 *          返回结果集
 	 */
@@ -226,19 +217,6 @@ public interface SQLCommand {
 	 */
 	<T> Future<Integer> upsertAll(T obj);
 
-
-	/**
-	 * 插入一个对象包括属性值为null的值
-	 *
-	 * @param obj
-	 *          对象
-	 * @param dupCol
-	 * 			冲突列
-	 * @return future
-	 *          返回操作结果
-	 */
-	<T> Future<Integer> upsertAll(T obj,String dupCol);
-
 	/**
 	 * 插入一个对象,只插入对象中值不为null的属性
 	 *
@@ -262,20 +240,6 @@ public interface SQLCommand {
 	<T> Future<Integer> upsertNonEmpty(T obj);
 
 
-
-	/**
-	 * 插入一个对象,只插入对象中值不为null的属性
-	 *
-	 * @param obj
-	 *          对象
-	 * @param dupCol
-	 * 			冲突列
-	 * @return future
-	 *          返回操作结果
-	 */
-	<T> Future<Integer> upsertNonEmpty(T obj,String dupCol);
-
-
 	/**
 	 * 插入一个对象,只插入对象中值不为null的属性
 	 *
@@ -285,17 +249,6 @@ public interface SQLCommand {
 	 *          返回操作结果
 	 */
 	<T> Future<JsonArray> insertNonEmptyReturnId(T obj);
-
-	/**
-	 * 插入一个对象,如果该对象不存在就新建如果该对象已经存在就更新
-	 *
-	 * @param obj
-	 *          对象
-	 *
-	 * @return future
-	 *          结果集受影响的行数
-	 */
-	<T> Future<Integer> replace(T obj);
 
 	/**
 	 * 更新一个对象中所有的属性包括null值,条件为对象中的主键值
@@ -309,12 +262,12 @@ public interface SQLCommand {
 	<T> Future<Integer> updateAllById(T obj);
 	/**
 	 * 更新一个对象中所有的属性包括null值,条件为SqlAssist条件集<br>
-	 * 
+	 *
 	 * @param obj
 	 *          对象
 	 * @param assist
 	 *          sql帮助工具
-	 * 
+	 *
 	 * @return future
 	 *          返回操作结果
 	 */
@@ -369,7 +322,7 @@ public interface SQLCommand {
 	<T> Future<Integer> updateSetNullByAssist(SqlAssist assist, List<String> columns);
 	/**
 	 * 通过主键值删除对应的数据行
-	 * 
+	 *
 	 * @param primaryValue
 	 *          主键值
 	 * @return future
