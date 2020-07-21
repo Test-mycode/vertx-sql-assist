@@ -10,7 +10,7 @@ import java.util.List;
 
 /**
  * SQLite通用SQL操作
- *
+ * 
  * @author <a href="http://szmirren.com">Mirren</a>
  *
  */
@@ -32,7 +32,9 @@ public class PostgreSQLStatementSQL extends AbstractStatementSQL {
 	}
 
 	@Override
-	public <T> SqlAndParams upsertAllSQL(T obj) {
+	public <T> SqlAndParams upsertAllSQL(T obj, String dupCol) {
+		if(dupCol==null||dupCol.trim().equals(""))
+			dupCol = this.getSqlPrimaryId();
 		JsonArray params = null;
 		StringBuilder tempColumn = null;
 		StringBuilder tempValues = null;
@@ -61,7 +63,7 @@ public class PostgreSQLStatementSQL extends AbstractStatementSQL {
 			}
 		}
 		String sql = String.format("insert into %s (%s) values (%s) ON CONFLICT(%s) do update set %s",
-				getSqlTableName(), tempColumn, tempValues, getSqlPrimaryId(),updateItems);
+				getSqlTableName(), tempColumn, tempValues, dupCol,updateItems);
 		SqlAndParams result = new SqlAndParams(sql, params);
 		if (LOG.isDebugEnabled()) {
 			LOG.debug("upsertAllSQL : " + result.toString());
@@ -70,7 +72,10 @@ public class PostgreSQLStatementSQL extends AbstractStatementSQL {
 	}
 
 	@Override
-	public <T> SqlAndParams upsertNonEmptySQL(T obj) {
+	public <T> SqlAndParams upsertNonEmptySQL(T obj, String dupCol) {
+		if(dupCol==null||dupCol.trim().equals(""))
+			dupCol = this.getSqlPrimaryId();
+
 		JsonArray params = null;
 		StringBuilder tempColumn = null;
 		StringBuilder tempValues = null;
@@ -96,7 +101,7 @@ public class PostgreSQLStatementSQL extends AbstractStatementSQL {
 				params.add(pv.getValue());
 			}
 		}
-		String sql = String.format("insert into %s (%s) values (%s) ON CONFLICT(%s) do update set %s", getSqlTableName(), tempColumn, tempValues,getSqlPrimaryId(),updateItems);
+		String sql = String.format("insert into %s (%s) values (%s) ON CONFLICT(%s) do update set %s", getSqlTableName(), tempColumn, tempValues,dupCol,updateItems);
 		SqlAndParams result = new SqlAndParams(sql, params);
 		if (this.getLOG().isDebugEnabled()) {
 			this.getLOG().debug("upsertNonEmptySQL : " + result.toString());

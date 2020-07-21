@@ -82,5 +82,9 @@ public class SQLClientTest {
         User user3 = new User();
         user3.setName("update name4");
         userSql.updateNonEmptyByAssist(user3, new SqlAssist().andEq("id", 4L)).toCompletionStage().toCompletableFuture().get();
+
+        synchronized (SQLClientTest.class) {
+            SQLClientTest.class.wait();
+        }
     }
 }

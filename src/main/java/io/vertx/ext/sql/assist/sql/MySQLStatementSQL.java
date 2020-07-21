@@ -10,7 +10,7 @@ import java.util.List;
 
 /**
  * MySQL通用SQL操作
- *
+ * 
  * @author <a href="http://szmirren.com">Mirren</a>
  *
  */
@@ -37,7 +37,7 @@ public class MySQLStatementSQL extends AbstractStatementSQL {
 	}
 
 	@Override
-	public <T> SqlAndParams upsertAllSQL(T obj) {
+	public <T> SqlAndParams upsertAllSQL(T obj, String dupCol) {
 		JsonArray params = null;
 		StringBuilder tempColumn = null;
 		StringBuilder tempValues = null;
@@ -76,7 +76,7 @@ public class MySQLStatementSQL extends AbstractStatementSQL {
 	}
 
 	@Override
-	public <T> SqlAndParams upsertNonEmptySQL(T obj) {
+	public <T> SqlAndParams upsertNonEmptySQL(T obj, String dupCol) {
 		JsonArray params = null;
 		StringBuilder tempColumn = null;
 		StringBuilder tempValues = null;

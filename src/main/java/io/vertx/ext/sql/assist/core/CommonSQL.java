@@ -12,7 +12,7 @@ import io.vertx.ext.sql.assist.anno.TableId;
 
 /**
  * 通用的数据库操作客户端的默认实现,
- *
+ * 
  * @author <a href="http://mirrentools.org">Mirren</a>
  *
  * @param <E>
@@ -41,7 +41,7 @@ public abstract class CommonSQL<E, C> implements CommonSQLClient<C> {
 
 	/**
 	 * 使用自定义的{@link SQLStatement}
-	 *
+	 * 
 	 * @param execute
 	 *          SQL执行器
 	 * @param statement
@@ -53,9 +53,9 @@ public abstract class CommonSQL<E, C> implements CommonSQLClient<C> {
 
 	/**
 	 * 获取客户端
-	 *
+	 * 
 	 * @return dbClient
-	 *
+	 * 
 	 */
 	@Override
 	public C getDbClient() {
@@ -128,6 +128,11 @@ public abstract class CommonSQL<E, C> implements CommonSQLClient<C> {
 	}
 
 	@Override
+	public <T> Future<Integer> upsertAll(T obj, String dupCol) {
+		return command.upsertAll(obj,dupCol);
+	}
+
+	@Override
 	public <T> Future<Integer> insertNonEmpty(T obj) {
 		return command.insertNonEmpty(obj);
 	}
@@ -135,6 +140,11 @@ public abstract class CommonSQL<E, C> implements CommonSQLClient<C> {
 	@Override
 	public <T> Future<Integer> upsertNonEmpty(T obj) {
 		return command.upsertNonEmpty(obj);
+	}
+
+	@Override
+	public <T> Future<Integer> upsertNonEmpty(T obj, String dupCol) {
+		return command.upsertNonEmpty(obj,dupCol);
 	}
 
 	@Override
