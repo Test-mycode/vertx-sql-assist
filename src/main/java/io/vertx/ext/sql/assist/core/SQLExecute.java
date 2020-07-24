@@ -5,22 +5,20 @@ import java.util.List;
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
-import io.vertx.core.logging.Logger;
-import io.vertx.ext.sql.SQLClient;
 import io.vertx.ext.sql.SQLOperations;
 import io.vertx.ext.sql.assist.sql.MySQLStatementSQL;
 import io.vertx.ext.sql.assist.sql.PostgreSQLStatementSQL;
 
 /**
  * SQL执行器
- * 
+ *
  * @author <a href="http://szmirren.com">Mirren</a>
  *
  */
 public interface SQLExecute<T> {
 	/**
 	 * 通过SQL客户端创建一个实例
-	 * 
+	 *
 	 * @param client
 	 * @return
 	 */
@@ -40,13 +38,13 @@ public interface SQLExecute<T> {
 
 	/**
 	 * 获取客户端
-	 * 
+	 *
 	 * @return
 	 */
 	T getClient();
 	/**
 	 * 执行查询
-	 * 
+	 *
 	 * @param qp
 	 *          SQL语句与参数
 	 * @return future
@@ -56,7 +54,7 @@ public interface SQLExecute<T> {
 
 	/**
 	 * 执行查询
-	 * 
+	 *
 	 * @param qp
 	 *          SQL语句与参数
 	 * @return future
@@ -66,7 +64,7 @@ public interface SQLExecute<T> {
 
 	/**
 	 * 执行查询
-	 * 
+	 *
 	 * @param qp
 	 *          SQL语句与参数
 	 * @return future
@@ -86,10 +84,10 @@ public interface SQLExecute<T> {
 
 	/**
 	 * 执行更新等操作得到受影响的行数
-	 * 
+	 *
 	 * @param qp
 	 *          SQL语句与参数
-	 * 
+	 *
 	 * @return future
 	 */
 	Future<Integer> update(SqlAndParams qp);

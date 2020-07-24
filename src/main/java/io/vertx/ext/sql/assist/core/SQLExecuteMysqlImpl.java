@@ -4,9 +4,7 @@ import io.vertx.core.Future;
 import io.vertx.core.Promise;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
-import io.vertx.core.logging.Logger;
 import io.vertx.ext.sql.ResultSet;
-import io.vertx.ext.sql.SQLClient;
 import io.vertx.ext.sql.SQLOperations;
 import io.vertx.ext.sql.UpdateResult;
 

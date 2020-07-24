@@ -22,7 +22,7 @@ public class SQLClientTest {
         JsonObject config = new JsonObject()
                 .put("host", "localhost")
                 .put("port", 5432)
-                .put("database", "postgres")
+                .put("database", "pqdemo")
                 .put("username", "postgres")
                 .put("password", "123456789");
         SQLClient client = PostgreSQLClient.createShared(vertx, config);
@@ -50,6 +50,9 @@ public class SQLClientTest {
         user.setName("test");
         user.setPwd("123456");
 
+        boolean exist = userSql.getExist(new SqlAssist().andEq("username",1)).toCompletionStage().toCompletableFuture().get();
+
+
         List<JsonObject> res = userSql.selectAll(new SqlAssist().andIn("id",1,2,3)).toCompletionStage().toCompletableFuture().get();
 
         //
@@ -61,7 +64,7 @@ public class SQLClientTest {
         //
         userSql.getCount(new SqlAssist().andLte("id", 10)).toCompletionStage().toCompletableFuture().get();
 
-        //
+              //
         userSql.selectAll().toCompletionStage().toCompletableFuture().get();
 
         //

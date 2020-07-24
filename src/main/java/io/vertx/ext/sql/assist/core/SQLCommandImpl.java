@@ -21,12 +21,6 @@ public class SQLCommandImpl implements SQLCommand {
      */
     private final SQLExecute<?> execute;
 
-    /**
-     * 初始化
-     *
-     * @param statement
-     * @param execute
-     */
     public SQLCommandImpl(SQLStatement statement, SQLExecute<?> execute) {
         super();
         this.statement = statement;
@@ -49,6 +43,13 @@ public class SQLCommandImpl implements SQLCommand {
                 return Future.succeededFuture(0L);
             }
         });
+    }
+
+    @Override
+    public Future<Boolean> getExist(SqlAssist assist) {
+        SqlAndParams qp = statement.getExistSQL(assist);
+
+        return execute.queryAsListArray(qp).compose(rows -> Future.succeededFuture(!rows.isEmpty()));
     }
 
     @Override
@@ -118,12 +119,6 @@ public class SQLCommandImpl implements SQLCommand {
     }
 
     @Override
-    public <T> Future<Integer> replace(T obj) {
-        SqlAndParams qp = statement.replaceSQL(obj);
-        return execute.update(qp);
-    }
-
-    @Override
     public <T> Future<Integer> updateAllById(T obj) {
         SqlAndParams qp = statement.updateAllByIdSQL(obj);
         return execute.update(qp);
@@ -154,7 +149,7 @@ public class SQLCommandImpl implements SQLCommand {
     }
 
     @Override
-    public <T> Future<Integer> updateSetNullByAssist(SqlAssist assist, List<String> columns) {
+    public Future<Integer> updateSetNullByAssist(SqlAssist assist, List<String> columns) {
         SqlAndParams qp = statement.updateSetNullByAssistSQL(assist, columns);
         return execute.update(qp);
     }

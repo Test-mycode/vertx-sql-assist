@@ -18,7 +18,7 @@ import io.vertx.ext.sql.assist.anno.TableId;
 /**
  * 抽象数据库操作语句,默认以MySQL标准来编写,如果其他数据库可以基础并重写不兼容的方法<br>
  * 通常不支持limit分页的数据库需要重写{@link #selectAllSQL(SqlAssist)}与{@link #selectByObjSQL(Object, String, String, boolean)}这两个方法
- * 
+ *
  * @author <a href="https://mirrentools.org/">Mirren</a>
  */
 public abstract class AbstractStatementSQL implements SQLStatement {
@@ -72,7 +72,7 @@ public abstract class AbstractStatementSQL implements SQLStatement {
 		if (!hasId) {
 			throw new NullPointerException(entity.getName() + " no TableId annotation ,you need to set @TableId on the field");
 		}
-		if (!hasCol && !hasId) {
+		if (!hasCol) {
 			throw new NullPointerException(entity.getName() + " no TableColumn annotation ,you need to set @TableColumn on the field");
 		}
 		this.sqlResultColumns = column.substring(1);
@@ -87,7 +87,7 @@ public abstract class AbstractStatementSQL implements SQLStatement {
 	}
 	/**
 	 * 获取表名称
-	 * 
+	 *
 	 * @return
 	 */
 	public String getSqlTableName() {
@@ -107,7 +107,7 @@ public abstract class AbstractStatementSQL implements SQLStatement {
 
 	/**
 	 * 获取主键名称
-	 * 
+	 *
 	 * @return
 	 */
 	public String getSqlPrimaryId() {
@@ -116,7 +116,7 @@ public abstract class AbstractStatementSQL implements SQLStatement {
 
 	/**
 	 * 设置主键名称,当有多个主键时可以重写给方法设置以哪一个主键为主
-	 * 
+	 *
 	 * @param sqlPrimaryId
 	 * @return
 	 */
@@ -127,7 +127,7 @@ public abstract class AbstractStatementSQL implements SQLStatement {
 
 	/**
 	 * 获取表返回列
-	 * 
+	 *
 	 * @return
 	 */
 	public String getSqlResultColumns() {
@@ -136,7 +136,7 @@ public abstract class AbstractStatementSQL implements SQLStatement {
 
 	/**
 	 * 设置表返回列
-	 * 
+	 *
 	 * @param sqlResultColumns
 	 * @return
 	 */
@@ -147,13 +147,13 @@ public abstract class AbstractStatementSQL implements SQLStatement {
 
 	/**
 	 * 表的所有列名与列名对应的值
-	 * 
+	 *
 	 * @return
 	 * @throws Exception
 	 */
 	protected <T> List<SqlPropertyValue<?>> getPropertyValue(T obj) throws Exception {
 		Field[] fields = obj.getClass().getDeclaredFields();
-		List<SqlPropertyValue<?>> result = new ArrayList<>();;
+		List<SqlPropertyValue<?>> result = new ArrayList<>();
 		for (Field field : fields) {
 			field.setAccessible(true);
 			TableId tableId = field.getAnnotation(TableId.class);
@@ -214,6 +214,50 @@ public abstract class AbstractStatementSQL implements SQLStatement {
 	}
 
 	@Override
+	public SqlAndParams getExistSQL(SqlAssist assist) {
+		StringBuilder sql = new StringBuilder(String.format("select 1 from %s ", getSqlTableName()));
+		JsonArray params = null;
+		if (assist != null) {
+			if (assist.getJoinOrReference() != null) {
+				sql.append(assist.getJoinOrReference());
+			}
+			if (assist.getCondition() != null && assist.getCondition().size() > 0) {
+				List<SqlWhereCondition<?>> where = assist.getCondition();
+				params = new JsonArray();
+				sql.append(" where ").append(where.get(0).getRequire());
+				if (where.get(0).getValue() != null) {
+					params.add(where.get(0).getValue());
+				}
+				if (where.get(0).getValues() != null) {
+					for (Object value : where.get(0).getValues()) {
+						params.add(value);
+					}
+				}
+				for (int i = 1; i < where.size(); i++) {
+					sql.append(where.get(i).getRequire());
+					if (where.get(i).getValue() != null) {
+						params.add(where.get(i).getValue());
+					}
+					if (where.get(i).getValues() != null) {
+						for (Object value : where.get(i).getValues()) {
+							params.add(value);
+						}
+					}
+				}
+			}
+			if (assist.getGroupBy() != null) {
+				sql.append(" group by ").append(assist.getGroupBy()).append(" ");
+			}
+		}
+		sql.append(" limit 1");
+		SqlAndParams result = new SqlAndParams(sql.toString(), params);
+		if (this.getLOG().isDebugEnabled()) {
+			this.getLOG().debug("getCountSQL : " + result.toString());
+		}
+		return result;
+	}
+
+	@Override
 	public SqlAndParams selectAllSQL(SqlAssist assist) {
 		// 如果Assist为空返回默认默认查询语句,反则根据Assist生成语句sql语句
 		if (assist == null) {
@@ -226,7 +270,7 @@ public abstract class AbstractStatementSQL implements SQLStatement {
 			String distinct = assist.getDistinct() == null ? "" : assist.getDistinct();// 去重语句
 			String column = assist.getResultColumn() == null ? getSqlResultColumns() : assist.getResultColumn();// 表的列名
 			// 初始化SQL语句
-			StringBuilder sql = new StringBuilder(String.format("select %s %s from %s", distinct, column, getSqlTableName()));
+			StringBuilder sql = new StringBuilder(String.format("select %s %s.%s from %s", distinct,getSqlTableName(), column, getSqlTableName()));
 			JsonArray params = null;// 参数
 			if (assist.getJoinOrReference() != null) {
 				sql.append(assist.getJoinOrReference());
@@ -293,7 +337,7 @@ public abstract class AbstractStatementSQL implements SQLStatement {
 
 	@Override
 	public <S> SqlAndParams selectByIdSQL(S primaryValue, String resultColumns, String joinOrReference) {
-		String sql = String.format("select %s from %s %s where %s = ? ", (resultColumns == null ? getSqlResultColumns() : resultColumns),
+		String sql = String.format("select %s.%s from %s %s where %s = ? ",getSqlTableName(), (resultColumns == null ? getSqlResultColumns() : resultColumns),
 				getSqlTableName(), (joinOrReference == null ? "" : joinOrReference), getSqlPrimaryId());
 		JsonArray params = new JsonArray();
 		params.add(primaryValue);
@@ -307,7 +351,7 @@ public abstract class AbstractStatementSQL implements SQLStatement {
 	@Override
 	public <T> SqlAndParams selectByObjSQL(T obj, String resultColumns, String joinOrReference, boolean single) {
 		StringBuilder sql = new StringBuilder(
-				String.format("select %s from %s %s ", (resultColumns == null ? getSqlResultColumns() : resultColumns), getSqlTableName(),
+				String.format("select %s.%s from %s %s ",getSqlTableName(), (resultColumns == null ? getSqlResultColumns() : resultColumns), getSqlTableName(),
 						(joinOrReference == null ? "" : joinOrReference)));
 		JsonArray params = null;
 		boolean isFrist = true;
