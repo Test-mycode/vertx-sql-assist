@@ -1,5 +1,12 @@
 package io.vertx.ext.sql.assist;
 
+import com.github.jasync.sql.db.Connection;
+import com.github.jasync.sql.db.ConnectionPoolConfiguration;
+import com.github.jasync.sql.db.QueryResult;
+import com.github.jasync.sql.db.interceptor.LoggingInterceptorSupplier;
+import com.github.jasync.sql.db.interceptor.MdcQueryInterceptorSupplier;
+import com.github.jasync.sql.db.interceptor.PreparedStatementParams;
+import com.github.jasync.sql.db.interceptor.QueryInterceptor;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
@@ -11,8 +18,10 @@ import io.vertx.ext.sql.assist.core.SQLStatement;
 import io.vertx.ext.sql.assist.core.SqlAssist;
 import io.vertx.ext.sql.assist.sql.MySQLStatementSQL;
 import io.vertx.ext.sql.assist.sql.PostgreSQLStatementSQL;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
 public class SQLClientTest {
@@ -22,7 +31,7 @@ public class SQLClientTest {
         JsonObject config = new JsonObject()
                 .put("host", "localhost")
                 .put("port", 5432)
-                .put("database", "pqdemo")
+                .put("database", "postgres")
                 .put("username", "postgres")
                 .put("password", "123456789");
         SQLClient client = PostgreSQLClient.createShared(vertx, config);
@@ -50,8 +59,7 @@ public class SQLClientTest {
         user.setName("test");
         user.setPwd("123456");
 
-        boolean exist = userSql.getExist(new SqlAssist().andEq("username",1)).toCompletionStage().toCompletableFuture().get();
-
+        boolean exist = userSql.getExist(new SqlAssist().andEq("user","test")).toCompletionStage().toCompletableFuture().get();
 
         List<JsonObject> res = userSql.selectAll(new SqlAssist().andIn("id",1,2,3)).toCompletionStage().toCompletableFuture().get();
 

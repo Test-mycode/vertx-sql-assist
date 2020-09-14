@@ -11,7 +11,7 @@ import io.vertx.ext.sql.UpdateResult;
 import java.util.List;
 
 /**
- * JDBCClient版的SQL实现
+ * JasyncPostgresClient版的SQL实现
  *
  * @author <a href="http://szmirren.com">Mirren</a>
  */
@@ -35,12 +35,7 @@ public class SQLExecutePostgresqlImpl implements SQLExecute<SQLOperations> {
     public Future<JsonObject> queryAsObj(SqlAndParams qp) {
         return this.queryExecute(qp)
                 .map(ResultSet::getRows)
-                .map(rows -> {
-                    if (rows != null && !rows.isEmpty())
-                        return rows.get(0);
-                    else
-                        return null;
-                });
+                .map(rows -> rows.isEmpty()? null: rows.get(0));
     }
 
     @Override
@@ -58,7 +53,8 @@ public class SQLExecutePostgresqlImpl implements SQLExecute<SQLOperations> {
     @Override
     public Future<JsonArray> insert(SqlAndParams qp) {
         return this.queryExecute(qp)
-                .map(resultSet -> resultSet.getResults().get(0));
+                .map(ResultSet::getResults)
+                .map(results-> results.isEmpty()?new JsonArray():results.get(0));
     }
 
     @Override

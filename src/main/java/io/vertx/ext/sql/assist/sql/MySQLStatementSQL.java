@@ -6,6 +6,7 @@ import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.sql.assist.core.SqlAndParams;
 import io.vertx.ext.sql.assist.core.SqlPropertyValue;
 
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -38,10 +39,10 @@ public class MySQLStatementSQL extends AbstractStatementSQL {
 
 	@Override
 	public <T> SqlAndParams upsertAllSQL(T obj, String dupCol) {
-		JsonArray params = null;
-		StringBuilder tempColumn = null;
-		StringBuilder tempValues = null;
-		StringBuilder updateItems = null;
+		JsonArray params = new JsonArray();
+		LinkedList<String> tempColumn = new LinkedList<>();
+		LinkedList<String> tempValues = new LinkedList<>();
+		LinkedList<String> updateItems = new LinkedList<>();
 
 		List<SqlPropertyValue<?>> propertyValue;
 		try {
@@ -50,23 +51,16 @@ public class MySQLStatementSQL extends AbstractStatementSQL {
 			return new SqlAndParams(false, " Get SqlPropertyValue failed: " + e.getMessage());
 		}
 		for (SqlPropertyValue<?> pv : propertyValue) {
-			if (tempColumn == null) {
-				tempColumn = new StringBuilder(pv.getName());
-				tempValues = new StringBuilder("?");
-				updateItems = new StringBuilder(pv.getName()).append("=").append("?");
-				params = new JsonArray();
-			} else {
-				updateItems.append(",").append(pv.getName()).append("=").append("?");
-				tempColumn.append(",").append(pv.getName());
-				tempValues.append(",?");
-			}
+			tempColumn.add(pv.getName());
+			tempValues.add("?");
+			updateItems.add(pv.getName()+" = ? ");
 			if (pv.getValue() != null) {
 				params.add(pv.getValue());
 			} else {
 				params.addNull();
 			}
 		}
-		String sql = String.format("insert into %s (%s) values (%s) on duplicate key update %s", getSqlTableName(), tempColumn, tempValues,updateItems);
+		String sql = String.format("insert into %s (%s) values (%s) on duplicate key update %s", this.sqlTableName, String.join(",",tempColumn), String.join(",",tempValues),String.join(",",updateItems));
 
 		SqlAndParams result = new SqlAndParams(sql, new JsonArray().addAll(params).addAll(params));
 		if (this.getLOG().isDebugEnabled()) {
@@ -77,10 +71,10 @@ public class MySQLStatementSQL extends AbstractStatementSQL {
 
 	@Override
 	public <T> SqlAndParams upsertNonEmptySQL(T obj, String dupCol) {
-		JsonArray params = null;
-		StringBuilder tempColumn = null;
-		StringBuilder tempValues = null;
-		StringBuilder updateItems = null;
+		JsonArray params = new JsonArray();
+		LinkedList<String> tempColumn = new LinkedList<>();
+		LinkedList<String> tempValues = new LinkedList<>();
+		LinkedList<String> updateItems = new LinkedList<>();
 		List<SqlPropertyValue<?>> propertyValue;
 		try {
 			propertyValue = getPropertyValue(obj);
@@ -89,20 +83,13 @@ public class MySQLStatementSQL extends AbstractStatementSQL {
 		}
 		for (SqlPropertyValue<?> pv : propertyValue) {
 			if (pv.getValue() != null) {
-				if (tempColumn == null) {
-					tempColumn = new StringBuilder(pv.getName());
-					tempValues = new StringBuilder("?");
-					updateItems = new StringBuilder(pv.getName()).append("=").append("?");
-					params = new JsonArray();
-				} else {
-					updateItems.append(",").append(pv.getName()).append("=").append("?");
-					tempColumn.append(",").append(pv.getName());
-					tempValues.append(",?");
-				}
+				tempColumn.add(pv.getName());
+				tempValues.add("?");
+				updateItems.add(pv.getName()+" = ? ");
 				params.add(pv.getValue());
 			}
 		}
-		String sql = String.format("insert into %s (%s) values (%s) on duplicate key update %s", getSqlTableName(), tempColumn, tempValues,updateItems);
+		String sql = String.format("insert into %s (%s) values (%s) on duplicate key update %s", this.sqlTableName, String.join(",",tempColumn), String.join(",",tempValues),String.join(",",updateItems));
 		SqlAndParams result = new SqlAndParams(sql, new JsonArray().addAll(params).addAll(params));
 		if (this.getLOG().isDebugEnabled()) {
 			this.getLOG().debug("upsertNonEmptySQL : " + result.toString());

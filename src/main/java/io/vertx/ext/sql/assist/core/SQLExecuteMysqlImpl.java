@@ -11,7 +11,7 @@ import io.vertx.ext.sql.UpdateResult;
 import java.util.List;
 
 /**
- * JDBCClient版的SQL实现
+ * JasyncMysqlClient版的SQL实现
  *
  * @author <a href="http://szmirren.com">Mirren</a>
  */
