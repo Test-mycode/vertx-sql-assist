@@ -3,6 +3,7 @@ package io.vertx.ext.sql.assist.sql;
 import java.lang.reflect.Field;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.logging.Logger;
@@ -22,6 +23,10 @@ import io.vertx.ext.sql.assist.anno.TableId;
  * @author <a href="https://mirrentools.org/">Mirren</a>
  */
 public abstract class AbstractStatementSQL implements SQLStatement {
+    /*
+    * 表列的缓存
+    * */
+    private final ConcurrentHashMap<Class<?>,Field[]> tableCache;
     /**
      * 表的名称
      */
@@ -36,6 +41,7 @@ public abstract class AbstractStatementSQL implements SQLStatement {
 	protected String sqlResultColumns;
 
     public AbstractStatementSQL(Class<?> entity) {
+        this.tableCache= new ConcurrentHashMap<>();
         this.parseTable(entity);
         this.parseColumn(entity);
     }
@@ -112,8 +118,8 @@ public abstract class AbstractStatementSQL implements SQLStatement {
      * @return List
      */
     protected <T> List<SqlPropertyValue<?>> getPropertyValue(T obj) throws Exception {
-        Field[] fields = obj.getClass().getDeclaredFields();
         List<SqlPropertyValue<?>> result = new LinkedList<>();
+        Field [] fields = this.tableCache.computeIfAbsent(obj.getClass(),cls->obj.getClass().getDeclaredFields());
         for (Field field : fields) {
             field.setAccessible(true);
             TableId tableId = field.getAnnotation(TableId.class);

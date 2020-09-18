@@ -1,12 +1,5 @@
 package io.vertx.ext.sql.assist;
 
-import com.github.jasync.sql.db.Connection;
-import com.github.jasync.sql.db.ConnectionPoolConfiguration;
-import com.github.jasync.sql.db.QueryResult;
-import com.github.jasync.sql.db.interceptor.LoggingInterceptorSupplier;
-import com.github.jasync.sql.db.interceptor.MdcQueryInterceptorSupplier;
-import com.github.jasync.sql.db.interceptor.PreparedStatementParams;
-import com.github.jasync.sql.db.interceptor.QueryInterceptor;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
@@ -18,10 +11,8 @@ import io.vertx.ext.sql.assist.core.SQLStatement;
 import io.vertx.ext.sql.assist.core.SqlAssist;
 import io.vertx.ext.sql.assist.sql.MySQLStatementSQL;
 import io.vertx.ext.sql.assist.sql.PostgreSQLStatementSQL;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
 public class SQLClientTest {
@@ -94,8 +85,6 @@ public class SQLClientTest {
         user3.setName("update name4");
         userSql.updateNonEmptyByAssist(user3, new SqlAssist().andEq("id", 4L)).toCompletionStage().toCompletableFuture().get();
 
-        synchronized (SQLClientTest.class) {
-            SQLClientTest.class.wait();
-        }
+        client.close();
     }
 }
