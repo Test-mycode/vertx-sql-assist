@@ -23,7 +23,6 @@ public class SqlAndParams {
 	 */
 	public SqlAndParams(String sql) {
 		this.sql = sql;
-		System.out.println(sql);
 	}
 
 	/**
