@@ -342,7 +342,8 @@ public abstract class AbstractStatementSQL implements SQLStatement {
                 params.add(pv.getValue());
             }
         }
-        String sql = String.format("insert into %s (%s) values (%s) ", this.sqlTableName, tempColumn, tempValues);
+        ;
+        String sql = String.format("insert into %s (%s) values (%s) ", this.sqlTableName,String.join(",",tempColumn) , String.join(",",tempValues));
         SqlAndParams result = new SqlAndParams(sql, params);
         if (this.getLOG().isDebugEnabled()) {
             this.getLOG().debug("insertNonEmptySQL : " + result.toString());
