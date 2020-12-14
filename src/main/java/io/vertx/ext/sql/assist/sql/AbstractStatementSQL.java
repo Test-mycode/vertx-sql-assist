@@ -136,7 +136,7 @@ public abstract class AbstractStatementSQL implements SQLStatement {
         return result;
     }
 
-	public void parseSqlAssist(SqlAssist assist,StringBuilder stringBuffer,JsonArray params) {
+	public void parseSqlAssist(SqlAssist assist,StringBuilder stringBuffer,JsonArray params,Boolean withPage) {
 		if (assist.getJoinOrReference() != null) {
 			stringBuffer.append(assist.getJoinOrReference());
 		}
@@ -178,7 +178,7 @@ public abstract class AbstractStatementSQL implements SQLStatement {
         if (assist.getOrder() != null) {
             stringBuffer.append(assist.getOrder());
         }
-        if (assist.getRowSize() != null || assist.getStartRow() != null) {
+        if (withPage && (assist.getRowSize() != null || assist.getStartRow() != null )) {
             if (params == null) {
                 params = new JsonArray();
             }
@@ -198,7 +198,7 @@ public abstract class AbstractStatementSQL implements SQLStatement {
         StringBuilder sql = new StringBuilder(String.format("select count(0) from %s ", this.sqlTableName));
         JsonArray params = new JsonArray();
         if (assist != null) {
-           this.parseSqlAssist(assist,sql,params);
+           this.parseSqlAssist(assist,sql,params,false);
         }
         SqlAndParams result = new SqlAndParams(sql.toString(), params);
         if (this.getLOG().isDebugEnabled()) {
@@ -212,7 +212,7 @@ public abstract class AbstractStatementSQL implements SQLStatement {
         StringBuilder sql = new StringBuilder(String.format("select 1 from %s ", this.sqlTableName));
         JsonArray params = new JsonArray();
         if (assist != null) {
-            this.parseSqlAssist(assist,sql,params);
+            this.parseSqlAssist(assist,sql,params,false);
         }
         sql.append(" limit 1");
         SqlAndParams result = new SqlAndParams(sql.toString(), params);
@@ -237,7 +237,7 @@ public abstract class AbstractStatementSQL implements SQLStatement {
             // 初始化SQL语句
             StringBuilder sql = new StringBuilder(String.format("select %s %s.%s from %s", distinct, this.sqlTableName, column, this.sqlTableName));
             JsonArray params = new JsonArray();// 参数
-            this.parseSqlAssist(assist,sql,params);
+            this.parseSqlAssist(assist,sql,params,true);
             SqlAndParams result = new SqlAndParams(sql.toString(), params);
             if (this.getLOG().isDebugEnabled()) {
                 this.getLOG().debug("SelectAllSQL : " + result.toString());
@@ -412,7 +412,7 @@ public abstract class AbstractStatementSQL implements SQLStatement {
         }
 
         StringBuilder whereStr = new StringBuilder();
-        this.parseSqlAssist(assist,whereStr,params);
+        this.parseSqlAssist(assist,whereStr,params,false);
 
         String sql = String.format("update %s set %s %s", this.sqlTableName, String.join(",",tempColumn), whereStr);
 
@@ -495,7 +495,7 @@ public abstract class AbstractStatementSQL implements SQLStatement {
 
         StringBuilder whereStr = new StringBuilder();
 
-        this.parseSqlAssist(assist,whereStr,params);
+        this.parseSqlAssist(assist,whereStr,params,false);
 
         String sql = String.format("update %s set %s %s", this.sqlTableName, String.join(",",tempColumn), whereStr);
 
@@ -550,7 +550,7 @@ public abstract class AbstractStatementSQL implements SQLStatement {
         }
         JsonArray params = new JsonArray();
         StringBuilder whereStr = new StringBuilder();
-        this.parseSqlAssist(assist,whereStr,params);
+        this.parseSqlAssist(assist,whereStr,params,false);
 
         String sql = String.format("update %s set %s %s", this.sqlTableName, setStr.toString(), whereStr);
         SqlAndParams result = new SqlAndParams(sql, params);
@@ -582,7 +582,7 @@ public abstract class AbstractStatementSQL implements SQLStatement {
         }
         JsonArray params = new JsonArray();
         StringBuilder whereStr = new StringBuilder();
-        this.parseSqlAssist(assist,whereStr,params);
+        this.parseSqlAssist(assist,whereStr,params,false);
         String sql = String.format("delete from %s %s", this.sqlTableName, whereStr);
         SqlAndParams result = new SqlAndParams(sql, params);
         if (this.getLOG().isDebugEnabled()) {
