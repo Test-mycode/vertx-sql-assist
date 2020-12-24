@@ -12,7 +12,7 @@ import io.vertx.core.json.JsonObject;
  * @author <a href="https://mirrentools.org">Mirren</a>
  *
  */
-public class SqlAssist {
+public class SqlAssist<T> {
 	/** 去重 */
 	private String distinct;
 	/** 分组 */
@@ -42,6 +42,18 @@ public class SqlAssist {
 		super();
 	}
 
+	public SqlAssist(T query) {
+		super();
+		JsonObject json = JsonObject.mapFrom(query);
+		for(String key: json.fieldNames()) {
+			Object value = json.getValue(key);
+			if(value == null) continue;
+			if(value instanceof JsonObject || value instanceof JsonArray)
+				continue;
+			this.andEq(key,value);
+		}
+	}
+
 	/**
 	 * 该构造方法用于使用SqlAssist的静态条件方法,动态添加条件
 	 * 
@@ -51,15 +63,6 @@ public class SqlAssist {
 	 */
 	public SqlAssist(SqlWhereCondition<?>... require) {
 		this.setConditions(require);
-	}
-
-	/**
-	 * 将当前对象装换为json字符串
-	 * 
-	 * @return jsonStr
-	 */
-	public String toJsonStr() {
-		return toJson().toString();
 	}
 
 	/**
@@ -118,11 +121,11 @@ public class SqlAssist {
 	 * @param obj
 	 * @return
 	 */
-	public static SqlAssist fromJson(JsonObject obj) {
+	public static <T>SqlAssist<T> fromJson(JsonObject obj) {
 		if (obj == null || obj.isEmpty()) {
 			return null;
 		}
-		SqlAssist assist = new SqlAssist();
+		SqlAssist<T> assist = new SqlAssist<T>();
 		assist.setPage(obj.getInteger("page"));
 		assist.setStartRow(obj.getInteger("startRow"));
 		assist.setRowSize(obj.getInteger("rowSize"));
@@ -145,14 +148,14 @@ public class SqlAssist {
 
 	/**
 	 * 添加单个查询条件,参数为{@link SqlWhereCondition} ,推荐使用SqlWhereCondition的静态条件方法添加条件;
-	 * 
+	 *
 	 * @param require
 	 *          示例:查询等于使用 SqlWhereCondition.andEq("A.ID",10)...
 	 *          {@link SqlWhereCondition#andEq(String, Object)}
 	 */
-	public SqlAssist setConditions(SqlWhereCondition<?> require) {
+	public SqlAssist<T> setConditions(SqlWhereCondition<?> require) {
 		if (this.condition == null) {
-			this.condition = new ArrayList<SqlWhereCondition<?>>();
+			this.condition = new ArrayList<>();
 			if (require.getRequire() != null) {
 				String req = require.getRequire().trim();
 				if (req.toLowerCase().startsWith("and ") || req.toLowerCase().startsWith("or ")) {
@@ -171,9 +174,9 @@ public class SqlAssist {
 	 *          示例:查询等于使用 SqlWhereCondition.andEq("A.ID",10)...
 	 *          {@link SqlWhereCondition#andEq(String, Object)}
 	 */
-	public SqlAssist setConditions(SqlWhereCondition<?>... require) {
+	public SqlAssist<T> setConditions(SqlWhereCondition<?>... require) {
 		if (this.condition == null) {
-			this.condition = new ArrayList<SqlWhereCondition<?>>();
+			this.condition = new ArrayList<>();
 		}
 		for (int i = 0; i < require.length; i++) {
 			if (i == 0 && this.condition.size() == 0) {
@@ -195,7 +198,7 @@ public class SqlAssist {
 	 * @param conditions
 	 * @return
 	 */
-	private SqlAssist setCondition(List<SqlWhereCondition<?>> conditions) {
+	private SqlAssist<T> setCondition(List<SqlWhereCondition<?>> conditions) {
 		this.condition = conditions;
 		return this;
 	}
@@ -209,7 +212,7 @@ public class SqlAssist {
 	 *          列名:如果表中存在相同列名使用表名.列名
 	 * @return
 	 */
-	public <T> SqlAssist and(String column) {
+	public SqlAssist<T> and(String column) {
 		this.setConditions(SqlWhereCondition.and(column));
 		return this;
 	}
@@ -223,7 +226,7 @@ public class SqlAssist {
 	 *          列名:如果表中存在相同列名使用表名.列名
 	 * @return
 	 */
-	public <T> SqlAssist or(String column) {
+	public SqlAssist<T> or(String column) {
 		this.setConditions(SqlWhereCondition.or(column));
 		return this;
 	}
@@ -237,7 +240,7 @@ public class SqlAssist {
 	 *          列名:如果表中存在相同列名使用表名.列名
 	 * @return
 	 */
-	public <T> SqlAssist andIsNull(String column) {
+	public SqlAssist<T> andIsNull(String column) {
 		this.setConditions(SqlWhereCondition.andIsNull(column));
 		return this;
 	}
@@ -251,7 +254,7 @@ public class SqlAssist {
 	 *          列名:如果表中存在相同列名使用表名.列名
 	 * @return
 	 */
-	public <T> SqlAssist orIsNull(String column) {
+	public SqlAssist<T> orIsNull(String column) {
 		this.setConditions(SqlWhereCondition.orIsNull(column));
 		return this;
 	}
@@ -265,7 +268,7 @@ public class SqlAssist {
 	 *          列名:如果表中存在相同列名使用表名.列名
 	 * @return
 	 */
-	public <T> SqlAssist andIsNotNull(String column) {
+	public SqlAssist<T> andIsNotNull(String column) {
 		this.setConditions(SqlWhereCondition.andIsNotNull(column));
 		return this;
 	}
@@ -279,7 +282,7 @@ public class SqlAssist {
 	 *          列名:如果表中存在相同列名使用表名.列名
 	 * @return
 	 */
-	public <T> SqlAssist orIsNotNull(String column) {
+	public SqlAssist<T> orIsNotNull(String column) {
 		this.setConditions(SqlWhereCondition.orIsNotNull(column));
 		return this;
 	}
@@ -295,7 +298,7 @@ public class SqlAssist {
 	 *          条件值
 	 * @return
 	 */
-	public <T> SqlAssist andEq(String column, T value) {
+	public <V> SqlAssist<T> andEq(String column, V value) {
 		this.setConditions(SqlWhereCondition.andEq(column, value));
 		return this;
 	}
@@ -311,7 +314,7 @@ public class SqlAssist {
 	 *          条件值
 	 * @return
 	 */
-	public <T> SqlAssist orEq(String column, T value) {
+	public <V> SqlAssist<T> orEq(String column, V value) {
 		this.setConditions(SqlWhereCondition.orEq(column, value));
 		return this;
 	}
@@ -328,7 +331,7 @@ public class SqlAssist {
 	 *          条件值
 	 * @return
 	 */
-	public <T> SqlAssist andIn(String column, T... value) {
+	public <V> SqlAssist<T> andIn(String column, V... value) {
 		this.setConditions(SqlWhereCondition.andIn(column, value));
 		return this;
 	}
@@ -344,7 +347,7 @@ public class SqlAssist {
 	 *          条件值
 	 * @return
 	 */
-	public <T> SqlAssist orIn(String column, T... value) {
+	public <V> SqlAssist<T> orIn(String column, V... value) {
 		this.setConditions(SqlWhereCondition.orIn(column, value));
 		return this;
 	}
@@ -361,7 +364,7 @@ public class SqlAssist {
 	 *          条件值
 	 * @return
 	 */
-	public <T> SqlAssist andNotIn(String column, T... value) {
+	public <V> SqlAssist<T> andNotIn(String column, V... value) {
 		this.setConditions(SqlWhereCondition.andNotIn(column, value));
 		return this;
 	}
@@ -377,7 +380,7 @@ public class SqlAssist {
 	 *          条件值
 	 * @return
 	 */
-	public <T> SqlAssist orNotIn(String column, T... value) {
+	public <V> SqlAssist<T> orNotIn(String column, V... value) {
 		this.setConditions(SqlWhereCondition.orNotIn(column, value));
 		return this;
 	}
@@ -393,7 +396,7 @@ public class SqlAssist {
 	 *          条件值
 	 * @return
 	 */
-	public <T> SqlAssist andNeq(String column, T value) {
+	public <V> SqlAssist<T> andNeq(String column, V value) {
 		this.setConditions(SqlWhereCondition.andNeq(column, value));
 		return this;
 	}
@@ -409,7 +412,7 @@ public class SqlAssist {
 	 *          条件值
 	 * @return
 	 */
-	public <T> SqlAssist orNeq(String column, T value) {
+	public <V> SqlAssist<T> orNeq(String column, V value) {
 		this.setConditions(SqlWhereCondition.orNeq(column, value));
 		return this;
 	}
@@ -425,7 +428,7 @@ public class SqlAssist {
 	 *          条件值
 	 * @return
 	 */
-	public <T> SqlAssist andLt(String column, T value) {
+	public <V> SqlAssist<T> andLt(String column, V value) {
 		this.setConditions(SqlWhereCondition.andLt(column, value));
 		return this;
 	}
@@ -441,7 +444,7 @@ public class SqlAssist {
 	 *          条件值
 	 * @return
 	 */
-	public <T> SqlAssist orLt(String column, T value) {
+	public <V> SqlAssist<T> orLt(String column, V value) {
 		this.setConditions(SqlWhereCondition.orLt(column, value));
 		return this;
 	}
@@ -457,7 +460,7 @@ public class SqlAssist {
 	 *          条件值
 	 * @return
 	 */
-	public <T> SqlAssist andLte(String column, T value) {
+	public <V> SqlAssist<T> andLte(String column, V value) {
 		this.setConditions(SqlWhereCondition.andLte(column, value));
 		return this;
 	}
@@ -473,7 +476,7 @@ public class SqlAssist {
 	 *          条件值
 	 * @return
 	 */
-	public <T> SqlAssist orLte(String column, T value) {
+	public <V> SqlAssist<T> orLte(String column, V value) {
 		this.setConditions(SqlWhereCondition.orLte(column, value));
 		return this;
 	}
@@ -489,7 +492,7 @@ public class SqlAssist {
 	 *          条件值
 	 * @return
 	 */
-	public <T> SqlAssist andGt(String column, T value) {
+	public <V> SqlAssist<T> andGt(String column, V value) {
 		this.setConditions(SqlWhereCondition.andGt(column, value));
 		return this;
 	}
@@ -505,7 +508,7 @@ public class SqlAssist {
 	 *          条件值
 	 * @return
 	 */
-	public <T> SqlAssist orGt(String column, T value) {
+	public <V> SqlAssist<T> orGt(String column, V value) {
 		this.setConditions(SqlWhereCondition.orGt(column, value));
 		return this;
 	}
@@ -521,7 +524,7 @@ public class SqlAssist {
 	 *          条件值
 	 * @return
 	 */
-	public <T> SqlAssist andGte(String column, T value) {
+	public <V> SqlAssist<T> andGte(String column, V value) {
 		this.setConditions(SqlWhereCondition.andGte(column, value));
 		return this;
 	}
@@ -537,7 +540,7 @@ public class SqlAssist {
 	 *          条件值
 	 * @return
 	 */
-	public <T> SqlAssist orGte(String column, T value) {
+	public <V> SqlAssist<T> orGte(String column, V value) {
 		this.setConditions(SqlWhereCondition.orGte(column, value));
 		return this;
 	}
@@ -553,7 +556,7 @@ public class SqlAssist {
 	 *          条件值
 	 * @return
 	 */
-	public <T> SqlAssist andLike(String column, T value) {
+	public <V> SqlAssist<T> andLike(String column, V value) {
 		this.setConditions(SqlWhereCondition.andLike(column, value));
 		return this;
 	}
@@ -569,7 +572,7 @@ public class SqlAssist {
 	 *          条件值
 	 * @return
 	 */
-	public <T> SqlAssist orLike(String column, T value) {
+	public <V> SqlAssist<T> orLike(String column, V value) {
 		this.setConditions(SqlWhereCondition.orLike(column, value));
 		return this;
 	}
@@ -585,7 +588,7 @@ public class SqlAssist {
 	 *          条件值
 	 * @return
 	 */
-	public <T> SqlAssist andNotLike(String column, T value) {
+	public <V> SqlAssist<T> andNotLike(String column, V value) {
 		this.setConditions(SqlWhereCondition.andNotLike(column, value));
 		return this;
 	}
@@ -601,7 +604,7 @@ public class SqlAssist {
 	 *          条件值
 	 * @return
 	 */
-	public <T> SqlAssist orNotLike(String column, T value) {
+	public <V> SqlAssist<T> orNotLike(String column, V value) {
 		this.setConditions(SqlWhereCondition.orNotLike(column, value));
 		return this;
 	}
@@ -617,7 +620,7 @@ public class SqlAssist {
 	 *          条件值
 	 * @return
 	 */
-	public <T> SqlAssist customCondition(String prefix, T value) {
+	public <V> SqlAssist<T> customCondition(String prefix, V value) {
 		this.setConditions(SqlWhereCondition.customCondition(prefix, value));
 		return this;
 	}
@@ -633,7 +636,7 @@ public class SqlAssist {
 	 *          条件值
 	 * @return
 	 */
-	public SqlAssist customCondition(String prefix, Object... value) {
+	public SqlAssist<T> customCondition(String prefix, Object... value) {
 		this.setConditions(SqlWhereCondition.customCondition(prefix, value));
 		return this;
 	}
@@ -664,7 +667,7 @@ public class SqlAssist {
 	 *          {@link #order(String column, boolean mode)}
 	 * @return
 	 */
-	public SqlAssist setOrders(String... order) {
+	public SqlAssist<T> setOrders(String... order) {
 		if (order == null || order.length == 0) {
 			this.order = null;
 			return this;
@@ -686,7 +689,7 @@ public class SqlAssist {
 	 * @param order
 	 * @return
 	 */
-	private SqlAssist setOrders(String order) {
+	private SqlAssist<T> setOrders(String order) {
 		this.order = order;
 		return this;
 	}
@@ -717,7 +720,7 @@ public class SqlAssist {
 	 *          要分组的列名比如id,type
 	 * @return
 	 */
-	public SqlAssist setGroupBy(String groupBy) {
+	public SqlAssist<T> setGroupBy(String groupBy) {
 		this.groupBy = groupBy;
 		return this;
 	}
@@ -742,7 +745,7 @@ public class SqlAssist {
 	 *          传入值 new JsonArray().add(1).add(2)
 	 * @return
 	 */
-	public SqlAssist setHaving(String having, JsonArray values) {
+	public SqlAssist<T> setHaving(String having, JsonArray values) {
 		this.having = having;
 		this.havingValue = values;
 		return this;
@@ -771,7 +774,7 @@ public class SqlAssist {
 	 * 
 	 * @param distinct
 	 */
-	public SqlAssist setDistincts(boolean distinct) {
+	public SqlAssist<T> setDistinct(boolean distinct) {
 		if (distinct) {
 			this.distinct = "distinct";
 			return this;
@@ -785,7 +788,7 @@ public class SqlAssist {
 	 * @param distinct
 	 * @return
 	 */
-	private SqlAssist setDistinct(String distinct) {
+	private SqlAssist<T> setDistinct(String distinct) {
 		this.distinct = distinct;
 		return this;
 	}
@@ -814,7 +817,7 @@ public class SqlAssist {
 	 * @param page
 	 * @return
 	 */
-	public SqlAssist setPage(Integer page) {
+	public SqlAssist<T> setPage(Integer page) {
 		this.page = page;
 		return this;
 	}
@@ -824,7 +827,7 @@ public class SqlAssist {
 	 * 
 	 * @param startRow
 	 */
-	public SqlAssist setStartRow(Integer startRow) {
+	public SqlAssist<T> setStartRow(Integer startRow) {
 		this.startRow = startRow;
 		return this;
 	}
@@ -843,7 +846,7 @@ public class SqlAssist {
 	 * 
 	 * @param rowSize
 	 */
-	public SqlAssist setRowSize(Integer rowSize) {
+	public SqlAssist<T> setRowSize(Integer rowSize) {
 		this.rowSize = rowSize;
 		return this;
 	}
@@ -862,7 +865,7 @@ public class SqlAssist {
 	 * 
 	 * @return
 	 */
-	public SqlAssist setResultColumn(String resultColumn) {
+	public SqlAssist<T> setResultColumn(String resultColumn) {
 		this.resultColumn = resultColumn;
 		return this;
 	}
@@ -885,7 +888,7 @@ public class SqlAssist {
 	 *          连接语句
 	 * @return
 	 */
-	public SqlAssist setJoinOrReference(String joinOrReference) {
+	public SqlAssist<T> setJoinOrReference(String joinOrReference) {
 		this.joinOrReference = joinOrReference;
 		return this;
 	}
